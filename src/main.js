@@ -6,7 +6,7 @@ const createTripInfoTemplate = () => {
   return (`
     <section class="trip-main__trip-info  trip-info">
     </section>
-  `)
+  `);
 };
 
 const createTripRouteTemplate = () => {
@@ -285,7 +285,7 @@ const createEditCardTemplate = () => {
         </section>
       </section>
     </form>
-  `)
+  `);
 };
 
 const createCardItemTemplate = () => {
@@ -324,7 +324,7 @@ const createCardItemTemplate = () => {
         </button>
       </div>
   </li>
-  `)
+  `);
 };
 
 const createAddEventTemplate = () => {
@@ -436,22 +436,22 @@ const createAddEventTemplate = () => {
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
     </form>
-  `)
+  `);
 };
 
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
 };
 
-const tripControls = document.querySelector('.trip-main__trip-controls');
-const menuBlock = tripControls.querySelectorAll('h2')[0];
-const filterBlock = tripControls.querySelectorAll('h2')[1];
-const tripInfoBlock = document.querySelector('.trip-main');
-const tripEvents = document.querySelector('.trip-events');
+const tripControls = document.querySelector(`.trip-main__trip-controls`);
+const menuBlock = tripControls.querySelectorAll(`h2`)[0];
+const filterBlock = tripControls.querySelectorAll(`h2`)[1];
+const tripInfoBlock = document.querySelector(`.trip-main`);
+const tripEvents = document.querySelector(`.trip-events`);
 
 render(tripInfoBlock, createTripInfoTemplate(), `afterbegin`);
 
-const tripInfoRoute = tripInfoBlock.querySelector('.trip-main__trip-info');
+const tripInfoRoute = tripInfoBlock.querySelector(`.trip-main__trip-info`);
 
 render(tripInfoRoute, createTripRouteTemplate(), `afterbegin`);
 render(tripInfoRoute, createTripCostTemplate());
@@ -461,12 +461,12 @@ render(tripEvents, createSortTemplate());
 render(tripEvents, createAddEventTemplate());
 render(tripEvents, createTasksTemplate());
 
-const eventsList = document.querySelector('.trip-events__list');
+const eventsList = document.querySelector(`.trip-events__list`);
 
 for (let i = 0; i < TASK_COUNT; i++) {
   render(eventsList, createCardItemTemplate());
 }
 
-const firstEvent = eventsList.querySelector('li');
+const firstEvent = eventsList.querySelector(`li`);
 
 render(firstEvent, createEditCardTemplate(), `beforebegin`);
