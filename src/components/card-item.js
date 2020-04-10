@@ -1,23 +1,37 @@
-export const createCardItemTemplate = () => {
+import {formatDate, formatTime} from "../utils.js";
+
+export const createCardItemTemplate = (cardData) => {
+
+  const {type, price, city, start, end} = cardData;
+  const startDate = formatDate(new Date(start), true);
+  const endDate = formatDate(new Date(end), true);
+  const startTime = formatTime(new Date(start).getHours(), new Date(start).getMinutes());
+  const endTime = formatTime(new Date(end).getHours(), new Date(end).getMinutes());
+  const difTime = new Date(end - start);
+
+  const duration = () => {
+    return difTime.getHours() * 60 + difTime.getMinutes();
+  };
+
   return (`
     <li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">Taxi to Amsterdam</h3>
+        <h3 class="event__title">${type} to ${city}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
-            &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
+          <time class="event__start-time" datetime="${startDate}T${startTime}">${startTime}</time>
+          &mdash;
+          <time class="event__end-time" datetime="${endDate}T${endTime}">${endTime}</time>
           </p>
-          <p class="event__duration">30M</p>
+          <p class="event__duration">${duration()}M</p>
         </div>
 
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">20</span>
+          &euro;&nbsp;<span class="event__price-value">${price}</span>
         </p>
 
         <h4 class="visually-hidden">Offers:</h4>
