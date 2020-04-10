@@ -1,7 +1,7 @@
 import {render} from "./utils.js";
-// import {createTripInfoTemplate} from "./components/trip-info.js";
-// import {createTripRouteTemplate} from "./components/trip-route.js";
-// import {createTripCostTemplate} from "./components/trip-cost.js";
+import {createTripInfoTemplate} from "./components/trip-info.js";
+import {createTripRouteTemplate} from "./components/trip-route.js";
+import {createTripCostTemplate} from "./components/trip-cost.js";
 import {createMenuTemplate} from "./components/site-menu.js";
 import {createFilterTemplate} from "./components/filter.js";
 import {createSortTemplate} from "./components/sorting.js";
@@ -43,18 +43,15 @@ const firstEvent = document.querySelector(`.trip-events__item`);
 
 render(firstEvent, createEditCardTemplate(cardsList[0]), `afterend`);
 
-// console.log(cardsList);
-// const citiesList = [
-//   ...new Set(cardsList.map((elem) => elem.city))
-// ]
+const citiesList = [
+  ...new Set(cardsList.map((elem) => elem.city))
+];
 
-// console.log(citiesList);
+const tripInfoBlock = document.querySelector(`.trip-main`);
 
-// const tripInfoBlock = document.querySelector(`.trip-main`);
+render(tripInfoBlock, createTripInfoTemplate(), `afterbegin`);
 
-// render(tripInfoBlock, createTripInfoTemplate(), `afterbegin`);
+const tripInfoRoute = tripInfoBlock.querySelector(`.trip-main__trip-info`);
 
-// const tripInfoRoute = tripInfoBlock.querySelector(`.trip-main__trip-info`);
-
-// render(tripInfoRoute, createTripRouteTemplate(), `afterbegin`);
-// render(tripInfoRoute, createTripCostTemplate());
+render(tripInfoRoute, createTripRouteTemplate(citiesList, datesList), `afterbegin`);
+render(tripInfoRoute, createTripCostTemplate(cardsList));
