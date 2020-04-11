@@ -3,16 +3,20 @@ import {getRandomArrayItem, getRandomIntegerNumber} from "../utils.js";
 const CADRS_AMOUNT = 20;
 
 export const routeTypes = [
-  `Taxi`,
-  `Bus`,
-  `Train`,
-  `Ship`,
-  `Transport`,
-  `Drive`,
-  `Flight`,
-  `Check-in`,
-  `Sightseeing`,
-  `Restaurant`
+  [
+    `Taxi`,
+    `Bus`,
+    `Train`,
+    `Ship`,
+    `Transport`,
+    `Drive`,
+    `Flight`
+  ],
+  [
+    `Check-in`,
+    `Sightseeing`,
+    `Restaurant`
+  ]
 ];
 
 export const cities = [
@@ -96,12 +100,20 @@ const getRandomDate = () => {
   );
 };
 
+const getRouteTypesArray = () => {
+  const routeTransportsArray = routeTypes[0];
+  const routeActivitiesArray = routeTypes[1];
+  const routeTypesArray = routeTransportsArray.concat(routeActivitiesArray);
+
+  return routeTypesArray;
+};
+
 const generateCard = () => {
   const startDate = getRandomDate();
   const endDate = getRandomDate();
 
   return {
-    type: getRandomArrayItem(routeTypes),
+    type: getRandomArrayItem(getRouteTypesArray()),
     city: getRandomArrayItem(cities),
     photos: getRandomPhotos(),
     description: getRandomDescription(),

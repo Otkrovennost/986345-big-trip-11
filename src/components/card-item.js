@@ -1,17 +1,27 @@
-import {formatDate, formatTime} from "../utils.js";
+import {formatDate, formatTime, getDuration} from "../utils.js";
+
+const getServices = (arr) => {
+  return arr.map((service) => {
+    return (`
+      <li class="event__offer">
+        <span class="event__offer-title">${service.title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${service.price}</span>
+      </li>
+      `);
+  }).join(``);
+};
 
 export const createCardItemTemplate = (cardData) => {
 
-  const {type, price, city, start, end} = cardData;
+  const {type, price, city, start, end, services} = cardData;
   const startDate = formatDate(new Date(start), true);
   const endDate = formatDate(new Date(end), true);
   const startTime = formatTime(new Date(start).getHours(), new Date(start).getMinutes());
   const endTime = formatTime(new Date(end).getHours(), new Date(end).getMinutes());
   const difTime = new Date(end - start);
-
-  const duration = () => {
-    return difTime.getHours() * 60 + difTime.getMinutes();
-  };
+  const durationTime = getDuration(difTime);
+  const servicesList = getServices(services);
 
   return (`
     <li class="trip-events__item">
@@ -27,7 +37,7 @@ export const createCardItemTemplate = (cardData) => {
           &mdash;
           <time class="event__end-time" datetime="${endDate}T${endTime}">${endTime}</time>
           </p>
-          <p class="event__duration">${duration()}M</p>
+          <p class="event__duration">${durationTime}M</p>
         </div>
 
         <p class="event__price">
@@ -36,11 +46,7 @@ export const createCardItemTemplate = (cardData) => {
 
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          <li class="event__offer">
-            <span class="event__offer-title">Order Uber</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">20</span>
-          </li>
+        ${servicesList}
         </ul>
 
         <button class="event__rollup-btn" type="button">

@@ -1,5 +1,54 @@
 import {formatDate, formatTime} from "../utils.js";
-import {routeTypes, cities} from "../mock/card.js";
+import {cities, routeTypes} from "../mock/card.js";
+
+const getTypeTransport = (arr) => {
+  return arr.map((typeTransport) => {
+    return (`
+      <div class="event__type-item">
+         <input id="event-type-${typeTransport.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTransport.toLowerCase()}">
+         <label class="event__type-label  event__type-label--${typeTransport.toLowerCase()}" for="event-type-${typeTransport.toLowerCase()}-1">${typeTransport}</label>
+      </div>
+    `);
+  }).join(``);
+};
+
+const getTypeActivity = (arr) => {
+  return arr.map((activity) => {
+    return (`
+      <div class="event__type-item">
+        <input id="event-type-${activity.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${activity.toLowerCase()}">
+        <label class="event__type-label  event__type-label--${activity.toLowerCase()}" for="event-type-${activity.toLowerCase()}-1">${activity}</label>
+      </div>
+    `);
+  }).join(``);
+};
+
+const getServices = (arr) => {
+  return arr.map((service) => {
+    return (`
+      <div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${service.type}-1" type="checkbox" name="event-offer-${service.type}" checked>
+        <label class="event__offer-label" for="event-offer-${service.type}-1">
+        <span class="event__offer-title">${service.title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${service.price}</span>
+        </label>
+      </div>
+    `);
+  }).join(``);
+};
+
+const getPhotosList = (arr) => {
+  return arr.map((photo) => {
+    return (`<img class="event__photo" src="${photo}" alt="Event photo">`);
+  });
+};
+
+const getCities = (arr) => {
+  return arr.map((cityName) => {
+    return (`<option value="${cityName}"></option>`);
+  }).join(``);
+};
 
 export const createEditCardTemplate = (cardData) => {
 
@@ -9,6 +58,11 @@ export const createEditCardTemplate = (cardData) => {
 
   const startTime = formatTime(new Date(start).getHours(), new Date(start).getMinutes());
   const endTime = formatTime(new Date(end).getHours(), new Date(end).getMinutes());
+  const typeTransport = getTypeTransport(routeTypes[0]);
+  const typeActivity = getTypeActivity(routeTypes[1]);
+  const servicesList = getServices(services);
+  const photosList = getPhotosList(photos);
+  const citiesList = getCities(cities);
 
   return (`
     <form class="event  event--edit" action="#" method="post">
@@ -23,26 +77,12 @@ export const createEditCardTemplate = (cardData) => {
           <div class="event__type-list">
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Transfer</legend>
-              ${routeTypes.slice(0, 7).map((typeTransport) => {
-      return (`
-                  <div class="event__type-item">
-                    <input id="event-type-${typeTransport.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTransport.toLowerCase()}">
-                    <label class="event__type-label  event__type-label--${typeTransport.toLowerCase()}" for="event-type-${typeTransport.toLowerCase()}-1">${typeTransport}</label>
-                  </div>
-                `);
-    }).join(``)}
+               ${typeTransport}
             </fieldset>
 
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Activity</legend>
-              ${routeTypes.slice(7).map((activity) => {
-      return (`
-                  <div class="event__type-item">
-                    <input id="event-type-${activity.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${activity.toLowerCase()}">
-                    <label class="event__type-label  event__type-label--${activity.toLowerCase()}" for="event-type-${activity.toLowerCase()}-1">${activity}</label>
-                  </div>
-               `);
-    }).join(``)}
+              ${typeActivity}
             </fieldset>
           </div>
         </div>
@@ -53,11 +93,7 @@ export const createEditCardTemplate = (cardData) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
           <datalist id="destination-list-1">
-          ${cities.map((cityName) => {
-      return (`
-              <option value="${cityName}"></option>
-            `);
-    }).join(``)}
+          ${citiesList}
           </datalist>
         </div>
         <div class="event__field-group  event__field-group--time">
@@ -88,18 +124,7 @@ export const createEditCardTemplate = (cardData) => {
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
-          ${services.map((service) => {
-      return (`
-              <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-${service.type}-1" type="checkbox" name="event-offer-${service.type}" checked>
-                <label class="event__offer-label" for="event-offer-${service.type}-1">
-                  <span class="event__offer-title">${service.title}</span>
-                  &plus;
-                  &euro;&nbsp;<span class="event__offer-price">${service.price}</span>
-                </label>
-              </div>
-            `);
-    }).join(``)}
+          ${servicesList}
           </div>
         </section>
 
@@ -109,11 +134,7 @@ export const createEditCardTemplate = (cardData) => {
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
-            ${photos.map((photo) => {
-      return (`
-                <img class="event__photo" src="${photo}" alt="Event photo">
-             `);
-    })}
+            ${photosList}
             </div>
           </div>
         </section>
