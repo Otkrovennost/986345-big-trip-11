@@ -18,7 +18,7 @@ const createCardTemplate = (date, index) => {
   );
 };
 
-export default class DayCard {
+export default class Day {
   constructor(date, index) {
     this._date = date;
     this._index = index;

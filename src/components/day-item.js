@@ -57,7 +57,7 @@ const createDayItemTemplate = (cardData) => {
   );
 };
 
-export default class DayEvent {
+export default class DayItem {
   constructor(cardData) {
     this._cardData = cardData;
     this._element = null;

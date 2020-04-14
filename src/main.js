@@ -5,10 +5,10 @@ import TripCost from "./components/trip-cost.js";
 import SiteMenu from "./components/site-menu.js";
 import Filter from "./components/filter.js";
 import Sorting from "./components/sorting.js";
-import TasksList from "./components/days-list.js";
-import DayCard from "./components/day.js";
-import DayEvent from "./components/day-item.js";
-import EditEvent from "./components/edit-item.js";
+import DaysList from "./components/days-list.js";
+import Day from "./components/day.js";
+import DayItem from "./components/day-item.js";
+import EditItem from "./components/edit-item.js";
 import {cardsList, datesList} from "./mock/card.js";
 import {menuNames} from "./mock/menu.js";
 import {sortOptions} from "./mock/sort.js";
@@ -20,23 +20,23 @@ const tripEvents = document.querySelector(`.trip-events`);
 renderElement(tripControls, new SiteMenu(menuNames).getElement(), RenderPosition.AFTERBEGIN);
 renderElement(tripControls, new Filter(filters).getElement(), RenderPosition.BEFOREEND);
 renderElement(tripEvents, new Sorting(sortOptions).getElement(), RenderPosition.BEFOREEND);
-renderElement(tripEvents, new TasksList().getElement(), RenderPosition.BEFOREEND);
+renderElement(tripEvents, new DaysList().getElement(), RenderPosition.BEFOREEND);
 
 const tripDaysList = document.querySelector(`.trip-days`);
 
 datesList.forEach((date, dateIndex) => {
-  const day = new DayCard(date, dateIndex + 1).getElement();
+  const day = new Day(date, dateIndex + 1).getElement();
 
   cardsList
     .filter((card) => new Date(card.start).toDateString() === date)
     .forEach((card) => {
-      const newEvent = new DayEvent(card).getElement();
+      const newEvent = new DayItem(card).getElement();
       const eventList = day.querySelector(`.trip-events__list`);
 
       renderElement(eventList, newEvent, RenderPosition.BEFOREEND);
 
       const editButton = newEvent.querySelector(`.event__rollup-btn`);
-      const editEventItem = new EditEvent(card).getElement();
+      const editEventItem = new EditItem(card).getElement();
       const closeButton = editEventItem.querySelector(`.event__reset-btn`);
 
       const onEditButtonClick = () => {
@@ -64,5 +64,5 @@ renderElement(tripInfoBlock, new TripInfo().getElement(), RenderPosition.AFTERBE
 
 const tripInfoRoute = tripInfoBlock.querySelector(`.trip-main__trip-info`);
 
-renderElement(tripInfoBlock, new TripRoute(citiesList, datesList).getElement(), RenderPosition.AFTERBEGIN);
+renderElement(tripInfoRoute, new TripRoute(citiesList, datesList).getElement(), RenderPosition.BEFOREEND);
 renderElement(tripInfoRoute, new TripCost(cardsList).getElement(), RenderPosition.BEFOREEND);

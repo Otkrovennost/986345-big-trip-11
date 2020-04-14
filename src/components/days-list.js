@@ -4,7 +4,7 @@ const createTasksListTemplate = () => {
   return (`<ul class="trip-days"></ul>`);
 };
 
-export default class TasksList {
+export default class DaysList {
   constructor() {
     this._element = null;
   }
