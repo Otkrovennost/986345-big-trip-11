@@ -1,18 +1,18 @@
-import {formatDate, formatTime, getDuration} from "../utils.js";
+import {formatDate, formatTime, getDuration, createElement} from "../utils.js";
 
 const getServices = (arr) => {
   return arr.map((service) => {
-    return (`
-      <li class="event__offer">
+    return (
+      `<li class="event__offer">
         <span class="event__offer-title">${service.title}</span>
         &plus;
         &euro;&nbsp;<span class="event__offer-price">${service.price}</span>
-      </li>
-      `);
+      </li>`
+    );
   }).join(``);
 };
 
-export const createCardItemTemplate = (cardData) => {
+const createDayItemTemplate = (cardData) => {
 
   const {type, price, city, start, end, services} = cardData;
   const startDate = formatDate(new Date(start), true);
@@ -23,8 +23,8 @@ export const createCardItemTemplate = (cardData) => {
   const durationTime = getDuration(difTime);
   const servicesList = getServices(services);
 
-  return (`
-    <li class="trip-events__item">
+  return (
+    `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
@@ -53,6 +53,29 @@ export const createCardItemTemplate = (cardData) => {
           <span class="visually-hidden">Open event</span>
         </button>
       </div>
-  </li>
-  `);
+    </li>`
+  );
 };
+
+export default class DayItem {
+  constructor(cardData) {
+    this._cardData = cardData;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createDayItemTemplate(this._cardData);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

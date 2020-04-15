@@ -1,25 +1,25 @@
-import {formatDate, formatTime} from "../utils.js";
+import {formatDate, formatTime, createElement} from "../utils.js";
 import {cities, routeTypes} from "../mock/card.js";
 
 const getTypeTransport = (arr) => {
   return arr.map((typeTransport) => {
-    return (`
-      <div class="event__type-item">
+    return (
+      `<div class="event__type-item">
          <input id="event-type-${typeTransport.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTransport.toLowerCase()}">
          <label class="event__type-label  event__type-label--${typeTransport.toLowerCase()}" for="event-type-${typeTransport.toLowerCase()}-1">${typeTransport}</label>
-      </div>
-    `);
+      </div>`
+    );
   }).join(``);
 };
 
 const getTypeActivity = (arr) => {
   return arr.map((activity) => {
-    return (`
-      <div class="event__type-item">
+    return (
+      `<div class="event__type-item">
         <input id="event-type-${activity.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${activity.toLowerCase()}">
         <label class="event__type-label  event__type-label--${activity.toLowerCase()}" for="event-type-${activity.toLowerCase()}-1">${activity}</label>
-      </div>
-    `);
+      </div>`
+    );
   }).join(``);
 };
 
@@ -33,8 +33,8 @@ const getServices = (arr) => {
         &plus;
         &euro;&nbsp;<span class="event__offer-price">${service.price}</span>
         </label>
-      </div>
-    `);
+      </div>`
+    );
   }).join(``);
 };
 
@@ -50,7 +50,7 @@ const getCities = (arr) => {
   }).join(``);
 };
 
-export const createEditCardTemplate = (cardData) => {
+const createEditEventTemplate = (cardData) => {
 
   const {type, city, photos, description, services, start, end, price} = cardData;
   const startDate = formatDate(new Date(start), false);
@@ -64,8 +64,8 @@ export const createEditCardTemplate = (cardData) => {
   const photosList = getPhotosList(photos);
   const citiesList = getCities(cities);
 
-  return (`
-    <form class="event  event--edit" action="#" method="post">
+  return (
+    `<form class="event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -118,6 +118,9 @@ export const createEditCardTemplate = (cardData) => {
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Open event</span>
+        </button>
       </header>
       <section class="event__details">
         <section class="event__section  event__section--offers">
@@ -139,6 +142,29 @@ export const createEditCardTemplate = (cardData) => {
           </div>
         </section>
       </section>
-    </form>
-  `);
+    </form>`
+  );
 };
+
+export default class EditItem {
+  constructor(cardData) {
+    this._cardData = cardData;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditEventTemplate(this._cardData);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
