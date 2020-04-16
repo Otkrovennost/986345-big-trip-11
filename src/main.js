@@ -75,6 +75,12 @@ if (cardsList.length === 0) {
           replaceEditToTask();
           document.removeEventListener(`keydown`, onEscKeyDown);
         });
+
+        editEventItem.addEventListener(`submit`, (evt) => {
+          evt.preventDefault();
+          replaceEditToTask();
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        });
       });
 
     renderElement(tripDaysList, day, RenderPosition.BEFOREEND);
