@@ -1,5 +1,6 @@
-import {formatDate, formatTime, createElement} from "../utils.js";
+import {formatDate, formatTime} from "../utils/common.js";
 import {cities, routeTypes} from "../mock/card.js";
+import AbstractComponent from "./abstract-component.js";
 
 const getTypeTransport = (arr) => {
   return arr.map((typeTransport) => {
@@ -146,8 +147,10 @@ const createEditEventTemplate = (cardData) => {
   );
 };
 
-export default class EditItem {
+export default class EditItem extends AbstractComponent {
   constructor(cardData) {
+    super();
+
     this._cardData = cardData;
     this._element = null;
   }
@@ -156,15 +159,11 @@ export default class EditItem {
     return createEditEventTemplate(this._cardData);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 
-  removeElement() {
-    this._element = null;
+  setCloseHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
   }
 }

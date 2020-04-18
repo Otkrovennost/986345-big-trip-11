@@ -1,4 +1,5 @@
-import {formatDate, formatTime, getDuration, createElement} from "../utils.js";
+import {formatDate, formatTime, getDuration} from "../utils/common.js";
+import AbstractComponent from "./abstract-component.js";
 
 const getServices = (arr) => {
   return arr.map((service) => {
@@ -57,8 +58,10 @@ const createDayItemTemplate = (cardData) => {
   );
 };
 
-export default class DayItem {
+export default class DayItem extends AbstractComponent {
   constructor(cardData) {
+    super();
+
     this._cardData = cardData;
     this._element = null;
   }
@@ -67,15 +70,7 @@ export default class DayItem {
     return createDayItemTemplate(this._cardData);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 }

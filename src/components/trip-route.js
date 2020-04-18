@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createTripRouteTemplate = (cities, dates) => {
 
@@ -22,8 +22,10 @@ const createTripRouteTemplate = (cities, dates) => {
   );
 };
 
-export default class TripRoute {
+export default class TripRoute extends AbstractComponent {
   constructor(cities, dates) {
+    super();
+
     this._cities = cities;
     this._datest = dates;
     this._element = null;
@@ -31,17 +33,5 @@ export default class TripRoute {
 
   getTemplate() {
     return createTripRouteTemplate(this._cities, this._datest);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

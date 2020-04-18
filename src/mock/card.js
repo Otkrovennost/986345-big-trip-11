@@ -1,4 +1,4 @@
-import {getRandomArrayItem, getRandomIntegerNumber} from "../utils.js";
+import {getRandomArrayItem, getRandomIntegerNumber} from "../utils/common.js";
 
 const CADRS_AMOUNT = 20;
 
