@@ -20,6 +20,20 @@ export const formatTime = (hours, minutes) => {
   return `${hours}:${(`0` + minutes).slice(-2)}`;
 };
 
-export const getDuration = (time) => {
-  return time.getHours() * 60 + time.getMinutes();
+const millisecondsToHours = (timeInMs) => Math.floor((timeInMs / (1000 * 60 * 60)) % 24);
+
+const millisecondsToMinutes = (timeInMs) => Math.floor((timeInMs / (1000 * 60)) % 60);
+
+export const millisecondsToHm = (timeInMs) => {
+  const hours = millisecondsToHours(timeInMs);
+  const minutes = millisecondsToMinutes(timeInMs);
+
+  return `${hours}H ${minutes}M`;
+};
+
+export const getDuration = (dif) => {
+  const difInHours = Number(millisecondsToHours(dif));
+  const difInMinutes = Number(millisecondsToMinutes(dif));
+
+  return difInHours * 60 + difInMinutes;
 };

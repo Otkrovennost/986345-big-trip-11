@@ -1,4 +1,4 @@
-import {formatDate, formatTime, getDuration} from "../utils/common.js";
+import {formatDate, formatTime, millisecondsToHm} from "../utils/common.js";
 import AbstractComponent from "./abstract-component.js";
 
 const getServices = (arr) => {
@@ -16,13 +16,12 @@ const getServices = (arr) => {
 const createDayItemTemplate = (cardData) => {
 
   const {type, price, city, start, end, services} = cardData;
+  const servicesList = getServices(services);
   const startDate = formatDate(new Date(start), true);
   const endDate = formatDate(new Date(end), true);
   const startTime = formatTime(new Date(start).getHours(), new Date(start).getMinutes());
   const endTime = formatTime(new Date(end).getHours(), new Date(end).getMinutes());
-  const difTime = new Date(end - start);
-  const durationTime = getDuration(difTime);
-  const servicesList = getServices(services);
+  const durationTime = millisecondsToHm(end - start);
 
   return (
     `<li class="trip-events__item">
@@ -38,7 +37,7 @@ const createDayItemTemplate = (cardData) => {
           &mdash;
           <time class="event__end-time" datetime="${endDate}T${endTime}">${endTime}</time>
           </p>
-          <p class="event__duration">${durationTime}M</p>
+          <p class="event__duration">${durationTime}</p>
         </div>
 
         <p class="event__price">
