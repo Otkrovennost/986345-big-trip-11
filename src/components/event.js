@@ -13,7 +13,7 @@ const getServices = (arr) => {
   }).join(``);
 };
 
-const createDayItemTemplate = (cardData) => {
+const createEventTemplate = (cardData) => {
 
   const {type, price, city, start, end, services} = cardData;
   const servicesList = getServices(services);
@@ -57,7 +57,7 @@ const createDayItemTemplate = (cardData) => {
   );
 };
 
-export default class DayItem extends AbstractComponent {
+export default class Event extends AbstractComponent {
   constructor(cardData) {
     super();
 
@@ -66,7 +66,7 @@ export default class DayItem extends AbstractComponent {
   }
 
   getTemplate() {
-    return createDayItemTemplate(this._cardData);
+    return createEventTemplate(this._cardData);
   }
 
   setClickHandler(handler) {

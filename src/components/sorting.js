@@ -1,7 +1,7 @@
 import AbstractComponent from "./abstract-component.js";
 
 export const SortType = {
-  DEFAULT: `event`,
+  EVENT: `event`,
   TIME: `time`,
   PRICE: `price`,
 };
