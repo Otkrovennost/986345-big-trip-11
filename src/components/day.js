@@ -2,17 +2,21 @@ import AbstractComponent from "./abstract-component.js";
 
 const createCardTemplate = (date, index) => {
 
-  const currentDate = new Date(date);
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth();
-  const currentDay = currentDate.getDate();
+  let dayInfo = ``;
+
+  if (date && index) {
+    const currentDate = new Date(date);
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+
+    dayInfo = `<span class="day__counter">${index}</span>
+    <time class="day__date" datetime="${currentYear}-${currentMonth + 1}-${currentDay}">${date.slice(4, 7).toUpperCase()}&nbsp;${currentDay}</time>`;
+  }
 
   return (
     `<li class="trip-days__item  day">
-      <div class="day__info">
-        <span class="day__counter">${index}</span>
-        <time class="day__date" datetime="${currentYear}-${currentMonth + 1}-${currentDay}">${date.slice(4, 7).toUpperCase()}&nbsp;${currentDay}</time>
-      </div>
+       <div class="day__info">${dayInfo}</div>
       <ul class="trip-events__list"></ul>
     </li>`
   );

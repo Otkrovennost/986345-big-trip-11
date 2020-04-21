@@ -147,7 +147,7 @@ const createEditEventTemplate = (cardData) => {
   );
 };
 
-export default class EditItem extends AbstractComponent {
+export default class EventEdit extends AbstractComponent {
   constructor(cardData) {
     super();
 
