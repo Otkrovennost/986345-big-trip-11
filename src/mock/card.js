@@ -64,7 +64,7 @@ const descriptions = [
   `In rutrum ac purus sit amet tempus.`
 ];
 
-const getRandomPhotos = () => {
+export const getRandomPhotos = () => {
   const photos = [];
 
   for (let i = 0; i < getRandomIntegerNumber(1, 5); i++) {
@@ -82,7 +82,7 @@ export const getRandomDescription = () => {
     .trim();
 };
 
-const getRandomServices = () => {
+export const getRandomServices = () => {
   const currentServices = [];
 
   for (let i = 0; i < getRandomIntegerNumber(0, 4); i++) {

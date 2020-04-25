@@ -42,7 +42,7 @@ export default class TripController {
     this._container = container;
 
     this._cards = [];
-    this._showedEvents = [];
+    this._pointsControllers = [];
     this._noTasksComponent = new NoTasksComponent();
     this._sortComponent = new Sorting(sortOptions);
     this._daysContainer = new DaysList();
@@ -60,7 +60,7 @@ export default class TripController {
     } else {
       renderElement(container, this._sortComponent, RenderPosition.AFTERBEGIN);
       renderElement(container, this._daysContainer, RenderPosition.BEFOREEND);
-      this._showedEvents = renderCards(this._cards, this._daysContainer, this._onDataChange, this._onViewChange);
+      this._pointsControllers = renderCards(this._cards, this._daysContainer, this._onDataChange, this._onViewChange);
 
       this._sortComponent.setSortTypeChangeHandler((sortType) => {
         let sortedTasks = [];
@@ -80,7 +80,7 @@ export default class TripController {
         }
 
         this._daysContainer.getElement().innerHTML = ``;
-        this._showedEvents = renderCards(sortedTasks, this._daysContainer, this._onDataChange, this._onViewChange, isDefaultSorting);
+        this._pointsControllers = renderCards(sortedTasks, this._daysContainer, this._onDataChange, this._onViewChange, isDefaultSorting);
       });
     }
   }
@@ -97,6 +97,6 @@ export default class TripController {
   }
 
   _onViewChange() {
-    this._showedEvents.forEach((it) => it.setDefaultView());
+    this._pointsControllers.forEach((it) => it.setDefaultView());
   }
 }

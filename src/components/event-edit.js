@@ -1,6 +1,6 @@
 import {formatDate, formatTime} from "../utils/common.js";
 import {actionByType} from "../utils/data.js";
-import {cities, routeTypes, getRandomDescription} from "../mock/card.js";
+import {cities, routeTypes, getRandomDescription, getRandomPhotos, getRandomServices} from "../mock/card.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
 
 const getTypeTransport = (arr) => {
@@ -52,9 +52,10 @@ const getCities = (arr) => {
   }).join(``);
 };
 
-const createEditEventTemplate = (cardData) => {
+const createEditEventTemplate = (cardData, option) => {
 
-  const {type, city, photos, description, services, start, end, price, isFavorite, index} = cardData;
+  const {start, end, price, isFavorite, index} = cardData;
+  const {type, city, description, photos, services} = option;
   const startDate = formatDate(new Date(start), false);
   const endDate = formatDate(new Date(end), false);
 
@@ -161,12 +162,23 @@ export default class EventEdit extends AbstractSmartComponent {
     super();
 
     this._cardData = cardData;
+    this._type = cardData.type;
+    this._city = cardData.city;
+    this._description = cardData.description;
+    this._photos = cardData.photos;
+    this._services = cardData.services;
     this._element = null;
     this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._cardData, {type: this._typeEvent});
+    return createEditEventTemplate(this._cardData, {
+      type: this._type,
+      city: this._city,
+      description: this._description,
+      services: this._services,
+      photos: this._photos
+    });
   }
 
   recoveryListeners() {
@@ -197,18 +209,21 @@ export default class EventEdit extends AbstractSmartComponent {
     this._favoritesClickHandler = handler;
   }
 
-
   _subscribeOnEvents() {
     const element = this.getElement();
 
     element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
-      this._cardData.type = actionByType.get(evt.target.value);
+
+      this._type = actionByType.get(evt.target.value);
 
       this.rerender();
     });
 
-    element.querySelector(`.event__input--destination`).addEventListener(`change`, () => {
-      this._cardData.description = getRandomDescription();
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      this._city = evt.target.value;
+      this._description = getRandomDescription();
+      this._photos = getRandomPhotos();
+      this._services = getRandomServices();
 
       this.rerender();
     });
