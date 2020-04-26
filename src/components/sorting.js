@@ -57,7 +57,20 @@ export default class Sorting extends AbstractComponent {
       this._currentSortType = sortType;
 
       handler(this._currentSortType);
+      this._checkedSortItem(evt.target.previousElementSibling);
     });
   }
-}
 
+  _checkedSortItem(sortItem) {
+    const sortItems = this._element.querySelectorAll(`.trip-sort__input`);
+
+    for (const sortElement of sortItems) {
+      if (sortElement.hasAttribute(`checked`)) {
+        sortElement.removeAttribute(`checked`);
+        break;
+      }
+    }
+
+    sortItem.setAttribute(`checked`, `checked`);
+  }
+}

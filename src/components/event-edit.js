@@ -1,13 +1,14 @@
 import {formatDate, formatTime} from "../utils/common.js";
-import {cities, routeTypes} from "../mock/card.js";
-import AbstractComponent from "./abstract-component.js";
+import {actionByType} from "../utils/data.js";
+import {cities, routeTypes, getRandomDescription, getRandomPhotos, getRandomServices} from "../mock/card.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
 
 const getTypeTransport = (arr) => {
   return arr.map((typeTransport) => {
     return (
       `<div class="event__type-item">
-         <input id="event-type-${typeTransport.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTransport.toLowerCase()}">
-         <label class="event__type-label  event__type-label--${typeTransport.toLowerCase()}" for="event-type-${typeTransport.toLowerCase()}-1">${typeTransport}</label>
+         <input id="event-type-${typeTransport.toLowerCase().slice(0, -3)}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTransport.toLowerCase().slice(0, -3)}">
+         <label class="event__type-label  event__type-label--${typeTransport.toLowerCase().slice(0, -3)}" for="event-type-${typeTransport.toLowerCase().slice(0, -3)}-1">${typeTransport.slice(0, -3)}</label>
       </div>`
     );
   }).join(``);
@@ -17,8 +18,8 @@ const getTypeActivity = (arr) => {
   return arr.map((activity) => {
     return (
       `<div class="event__type-item">
-        <input id="event-type-${activity.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${activity.toLowerCase()}">
-        <label class="event__type-label  event__type-label--${activity.toLowerCase()}" for="event-type-${activity.toLowerCase()}-1">${activity}</label>
+        <input id="event-type-${activity.toLowerCase().slice(0, -3)}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${activity.toLowerCase().slice(0, -3)}">
+        <label class="event__type-label  event__type-label--${activity.toLowerCase().slice(0, -3)}" for="event-type-${activity.toLowerCase().slice(0, -3)}-1">${activity.slice(0, -3)}</label>
       </div>`
     );
   }).join(``);
@@ -51,9 +52,10 @@ const getCities = (arr) => {
   }).join(``);
 };
 
-const createEditEventTemplate = (cardData) => {
+const createEditEventTemplate = (cardData, option) => {
 
-  const {type, city, photos, description, services, start, end, price} = cardData;
+  const {start, end, price, isFavorite, index} = cardData;
+  const {type, city, description, photos, services} = option;
   const startDate = formatDate(new Date(start), false);
   const endDate = formatDate(new Date(end), false);
 
@@ -64,16 +66,17 @@ const createEditEventTemplate = (cardData) => {
   const servicesList = getServices(services);
   const photosList = getPhotosList(photos);
   const citiesList = getCities(cities);
+  const isFavourite = isFavorite ? `checked` : ``;
 
   return (
     `<form class="event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
-          <label class="event__type  event__type-btn" for="event-type-toggle-1">
+          <label class="event__type  event__type-btn" for="event-type-toggle-${index}">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type.slice(0, -3)}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${index}" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -89,36 +92,43 @@ const createEditEventTemplate = (cardData) => {
         </div>
 
         <div class="event__field-group  event__field-group--destination">
-          <label class="event__label  event__type-output" for="event-destination-1">
-          ${type} to
+          <label class="event__label  event__type-output" for="event-destination-${index}">
+          ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
-          <datalist id="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-${index}" type="text" name="event-destination" value="${city}" list="destination-list-${index}">
+          <datalist id="destination-list-${index}">
           ${citiesList}
           </datalist>
         </div>
         <div class="event__field-group  event__field-group--time">
-          <label class="visually-hidden" for="event-start-time-1">
+          <label class="visually-hidden" for="event-start-time-${index}">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate} ${startTime}">
+          <input class="event__input  event__input--time" id="event-start-time-${index}" type="text" name="event-start-time" value="${startDate} ${startTime}">
           &mdash;
-          <label class="visually-hidden" for="event-end-time-1">
+          <label class="visually-hidden" for="event-end-time-${index}">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate} ${endTime}">
+          <input class="event__input  event__input--time" id="event-end-time-${index}" type="text" name="event-end-time" value="${endDate} ${endTime}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
-          <label class="event__label" for="event-price-1">
+          <label class="event__label" for="event-price-${index}">
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-${index}" type="text" name="event-price" value="${price}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
+        <input id="event-favorite-${index}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavourite}>
+        <label class="event__favorite-btn" for="event-favorite-${index}">
+          <span class="visually-hidden">Add to favorite</span>
+            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+            <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+          </svg>
+        </label>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>
@@ -147,23 +157,75 @@ const createEditEventTemplate = (cardData) => {
   );
 };
 
-export default class EventEdit extends AbstractComponent {
+export default class EventEdit extends AbstractSmartComponent {
   constructor(cardData) {
     super();
 
     this._cardData = cardData;
+    this._type = cardData.type;
+    this._city = cardData.city;
+    this._description = cardData.description;
+    this._photos = cardData.photos;
+    this._services = cardData.services;
     this._element = null;
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._cardData);
+    return createEditEventTemplate(this._cardData, {
+      type: this._type,
+      city: this._city,
+      description: this._description,
+      services: this._services,
+      photos: this._photos
+    });
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setFavoritesButtonClickHandler(this._favoritesClickHandler);
+    this.setClickHandler(this._clickHandler);
+    this.setCloseHandler(this._closeHandler);
+    this._subscribeOnEvents();
+  }
+
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._clickHandler = handler;
   }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
   }
 
   setCloseHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._closeHandler = handler;
+  }
+
+  setFavoritesButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoritesClickHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
+
+      this._type = actionByType.get(evt.target.value);
+
+      this.rerender();
+    });
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      this._city = evt.target.value;
+      this._description = getRandomDescription();
+      this._photos = getRandomPhotos();
+      this._services = getRandomServices();
+
+      this.rerender();
+    });
   }
 }

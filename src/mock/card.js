@@ -4,18 +4,18 @@ const CADRS_AMOUNT = 20;
 
 export const routeTypes = [
   [
-    `Taxi`,
-    `Bus`,
-    `Train`,
-    `Ship`,
-    `Transport`,
-    `Drive`,
-    `Flight`
+    `Taxi to`,
+    `Bus to`,
+    `Train to`,
+    `Ship to`,
+    `Transport to`,
+    `Drive to`,
+    `Flight to`
   ],
   [
-    `Check-in`,
-    `Sightseeing`,
-    `Restaurant`
+    `Check-in in`,
+    `Sightseeing in`,
+    `Restaurant in`
   ]
 ];
 
@@ -64,7 +64,7 @@ const descriptions = [
   `In rutrum ac purus sit amet tempus.`
 ];
 
-const getRandomPhotos = () => {
+export const getRandomPhotos = () => {
   const photos = [];
 
   for (let i = 0; i < getRandomIntegerNumber(1, 5); i++) {
@@ -74,7 +74,7 @@ const getRandomPhotos = () => {
   return photos;
 };
 
-const getRandomDescription = () => {
+export const getRandomDescription = () => {
   return descriptions
     .filter(() => Math.random() > 0.5)
     .slice(0, getRandomIntegerNumber(1, 3))
@@ -82,7 +82,7 @@ const getRandomDescription = () => {
     .trim();
 };
 
-const getRandomServices = () => {
+export const getRandomServices = () => {
   const currentServices = [];
 
   for (let i = 0; i < getRandomIntegerNumber(0, 4); i++) {
@@ -120,8 +120,15 @@ const generateCard = () => {
     services: getRandomServices(),
     start: Math.min(startDate, endDate),
     end: Math.max(startDate, endDate),
-    price: getRandomIntegerNumber(10, 100)
+    price: getRandomIntegerNumber(10, 100),
+    isFavorite: false
   };
+};
+
+const setIndexForCardsItem = (arr) => {
+  arr.forEach(function (elem) {
+    elem.index = arr.indexOf(elem);
+  });
 };
 
 const generateCards = (count) => {
@@ -134,6 +141,7 @@ const generateCards = (count) => {
 };
 
 export const cardsList = generateCards(CADRS_AMOUNT);
+setIndexForCardsItem(cardsList);
 
 export const datesList = [
   ...new Set(cardsList.map((elem) => new Date(elem.start).toDateString()))
