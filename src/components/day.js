@@ -1,3 +1,4 @@
+import moment from "moment";
 import AbstractComponent from "./abstract-component.js";
 
 const createCardTemplate = (date, index) => {
@@ -5,13 +6,12 @@ const createCardTemplate = (date, index) => {
   let dayInfo = ``;
 
   if (date && index) {
-    const currentDate = new Date(date);
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-    const currentDay = currentDate.getDate();
+    const fullDate = moment(date).format(`YYYY-MM-DDThh:mm`);
+    const month = moment(date).format(`MMM`);
+    const day = moment(date).format(`DD`);
 
     dayInfo = `<span class="day__counter">${index}</span>
-    <time class="day__date" datetime="${currentYear}-${currentMonth + 1}-${currentDay}">${date.slice(4, 7).toUpperCase()}&nbsp;${currentDay}</time>`;
+    <time class="day__date" datetime="${fullDate}">${month} ${day}</time>`;
   }
 
   return (

@@ -1,4 +1,8 @@
-import {formatDate, formatTime} from "../utils/common.js";
+import flatpickr from "flatpickr";
+import moment from "moment";
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
+
 import {actionByType} from "../utils/data.js";
 import {cities, routeTypes, getRandomDescription, getRandomPhotos, getRandomServices} from "../mock/card.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
@@ -56,11 +60,8 @@ const createEditEventTemplate = (cardData, option) => {
 
   const {start, end, price, isFavorite, index} = cardData;
   const {type, city, description, photos, services} = option;
-  const startDate = formatDate(new Date(start), false);
-  const endDate = formatDate(new Date(end), false);
-
-  const startTime = formatTime(new Date(start).getHours(), new Date(start).getMinutes());
-  const endTime = formatTime(new Date(end).getHours(), new Date(end).getMinutes());
+  const startDate = moment(start).format(`DD/MM/YY HH:mm`);
+  const endDate = moment(end).format(`DD/MM/YY HH:mm`);
   const typeTransport = getTypeTransport(routeTypes[0]);
   const typeActivity = getTypeActivity(routeTypes[1]);
   const servicesList = getServices(services);
@@ -101,15 +102,15 @@ const createEditEventTemplate = (cardData, option) => {
           </datalist>
         </div>
         <div class="event__field-group  event__field-group--time">
-          <label class="visually-hidden" for="event-start-time-${index}">
+          <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-${index}" type="text" name="event-start-time" value="${startDate} ${startTime}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate}">
           &mdash;
-          <label class="visually-hidden" for="event-end-time-${index}">
+          <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-${index}" type="text" name="event-end-time" value="${endDate} ${endTime}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -167,7 +168,12 @@ export default class EventEdit extends AbstractSmartComponent {
     this._description = cardData.description;
     this._photos = cardData.photos;
     this._services = cardData.services;
+
     this._element = null;
+    this._flatpickrStartDate = null;
+    this._flatpickrEndDate = null;
+
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -179,6 +185,12 @@ export default class EventEdit extends AbstractSmartComponent {
       services: this._services,
       photos: this._photos
     });
+  }
+
+  rerender() {
+    super.rerender();
+
+    this._applyFlatpickr();
   }
 
   recoveryListeners() {
@@ -226,6 +238,33 @@ export default class EventEdit extends AbstractSmartComponent {
       this._services = getRandomServices();
 
       this.rerender();
+    });
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickrStartDate || this._flatpickrEndDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrEndDate.destroy();
+      this._flatpickrStartDate = null;
+      this._flatpickrEndDate = null;
+    }
+
+    const element = this.getElement();
+
+    this._flatpickrStartDate = flatpickr(element.querySelector(`#event-start-time-1`), {
+      allowInput: true,
+      defaultDate: this._cardData.start,
+      dateFormat: `d/m/y H:i`,
+      minDate: this._cardData.start,
+      enableTime: true
+    });
+
+    this._flatpickrEndDate = flatpickr(element.querySelector(`#event-end-time-1`), {
+      allowInput: true,
+      defaultDate: this._cardData.end,
+      dateFormat: `d/m/y H:i`,
+      minDate: this._cardData.start,
+      enableTime: true
     });
   }
 }

@@ -1,4 +1,6 @@
-import {formatDate, formatTime, millisecondsToHm} from "../utils/common.js";
+import moment from "moment";
+
+import {getDurationTime} from "../utils/common.js";
 import AbstractComponent from "./abstract-component.js";
 
 const getServices = (arr) => {
@@ -17,11 +19,12 @@ const createEventTemplate = (cardData) => {
 
   const {type, price, city, start, end, services} = cardData;
   const servicesList = getServices(services);
-  const startDate = formatDate(new Date(start), true);
-  const endDate = formatDate(new Date(end), true);
-  const startTime = formatTime(new Date(start).getHours(), new Date(start).getMinutes());
-  const endTime = formatTime(new Date(end).getHours(), new Date(end).getMinutes());
-  const durationTime = millisecondsToHm(end - start);
+  const startDate = moment(start).format(`YYYY-MM-DDThh:mm:ss`);
+  const endDate = moment(end).format(`YYYY-MM-DDThh:mm:ss`);
+  const startTime = moment(start).format(`HH:mm`);
+  const endTime = moment(end).format(`HH:mm`);
+  const durationTime = getDurationTime(end - start);
+
 
   return (
     `<li class="trip-events__item">
@@ -33,9 +36,9 @@ const createEventTemplate = (cardData) => {
 
         <div class="event__schedule">
           <p class="event__time">
-          <time class="event__start-time" datetime="${startDate}T${startTime}">${startTime}</time>
+          <time class="event__start-time" datetime="${startDate}">${startTime}</time>
           &mdash;
-          <time class="event__end-time" datetime="${endDate}T${endTime}">${endTime}</time>
+          <time class="event__end-time" datetime="${endDate}">${endTime}</time>
           </p>
           <p class="event__duration">${durationTime}</p>
         </div>
