@@ -1,4 +1,3 @@
-import {getDuration} from "../utils/common.js";
 import {renderElement, RenderPosition} from "../utils/render.js";
 import Sorting, {SortType} from "../components/sorting.js";
 import DaysList from "../components/days-list.js";
@@ -75,7 +74,7 @@ export default class TripController {
             sortedTasks = this._cards.slice().sort((a, b) => b.price - a.price);
             break;
           case SortType.TIME:
-            sortedTasks = this._cards.slice().sort((a, b) => getDuration(b.end - b.start) - getDuration(a.end - a.start));
+            sortedTasks = this._cards.slice().sort((a, b) => (b.end - b.start) - (a.end - a.start));
             break;
         }
 
