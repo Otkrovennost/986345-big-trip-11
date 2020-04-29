@@ -55,6 +55,7 @@ export default class PointController {
       evt.preventDefault();
       const data = this._eventEditComponent.getData();
       this._onDataChange(this, _point, Object.assign({}, _point, data));
+      this._replaceEditToTask();
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, _point, null));
@@ -63,6 +64,7 @@ export default class PointController {
       this._onDataChange(this, _point, Object.assign({}, _point, {
         isFavorite: !_point.isFavorite,
       }));
+      this._mode = Mode.EDIT;
     });
 
     switch (mode) {
@@ -70,7 +72,6 @@ export default class PointController {
         if (oldEventComponent && oldEventEditComponent) {
           replace(this._eventComponent, oldEventComponent);
           replace(this._eventEditComponent, oldEventEditComponent);
-          this._replaceEditToTask();
         } else {
           renderElement(eventsList, this._eventComponent, RenderPosition.BEFOREEND);
         }
