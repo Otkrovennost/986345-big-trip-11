@@ -92,7 +92,7 @@ export const getRandomServices = () => {
   return currentServices;
 };
 
-const getRandomDate = () => {
+export const getRandomDate = () => {
   return (
     Date.now() +
     1 +
@@ -113,6 +113,7 @@ const generateCard = () => {
   const endDate = getRandomDate();
 
   return {
+    id: String(Math.floor(startDate + Math.random())),
     type: getRandomArrayItem(getRouteTypesArray()),
     city: getRandomArrayItem(cities),
     photos: getRandomPhotos(),

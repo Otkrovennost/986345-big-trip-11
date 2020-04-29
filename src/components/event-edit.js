@@ -1,8 +1,9 @@
-import flatpickr from "flatpickr";
 import moment from "moment";
+import flatpickr from "flatpickr";
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 
+import {EmptyPoint} from '../controllers/point-controller.js';
 import {actionByType} from "../utils/data.js";
 import {cities, routeTypes, getRandomDescription, getRandomPhotos, getRandomServices} from "../mock/card.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
@@ -47,7 +48,7 @@ const getServices = (arr) => {
 const getPhotosList = (arr) => {
   return arr.map((photo) => {
     return (`<img class="event__photo" src="${photo}" alt="Event photo">`);
-  });
+  }).join(``);
 };
 
 const getCities = (arr) => {
@@ -58,6 +59,11 @@ const getCities = (arr) => {
 
 const createEditEventTemplate = (cardData, option) => {
 
+  let creatingPoint = false;
+
+  if (cardData === EmptyPoint) {
+    creatingPoint = true;
+  }
   const {start, end, price, isFavorite, index} = cardData;
   const {type, city, description, photos, services} = option;
   const startDate = moment(start).format(`DD/MM/YY HH:mm`);
@@ -73,11 +79,11 @@ const createEditEventTemplate = (cardData, option) => {
     `<form class="event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
-          <label class="event__type  event__type-btn" for="event-type-toggle-${index}">
+          <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${type.slice(0, -3)}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${index}" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -122,17 +128,18 @@ const createEditEventTemplate = (cardData, option) => {
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : `Delete`}</button>
         <input id="event-favorite-${index}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavourite}>
-        <label class="event__favorite-btn" for="event-favorite-${index}">
+        <label class="event__favorite-btn ${creatingPoint ? `visually-hidden` : ``}" for="event-favorite-${index}">
           <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
             <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
           </svg>
         </label>
+        ${creatingPoint ? `` : `
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
-        </button>
+        </button>`}
       </header>
       <section class="event__details">
         <section class="event__section  event__section--offers">
@@ -158,6 +165,15 @@ const createEditEventTemplate = (cardData, option) => {
   );
 };
 
+const parseFormData = (formData) => {
+  return {
+    city: formData.get(`event-destination`),
+    start: flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`),
+    end: flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`),
+    price: formData.get(`event-price`)
+  };
+};
+
 export default class EventEdit extends AbstractSmartComponent {
   constructor(cardData) {
     super();
@@ -173,6 +189,10 @@ export default class EventEdit extends AbstractSmartComponent {
     this._flatpickrStartDate = null;
     this._flatpickrEndDate = null;
 
+    this._favoritesClickHandler = null;
+    this._submitHandler = null;
+    this._deleteButtonClickHandler = null;
+
     this._applyFlatpickr();
     this._subscribeOnEvents();
   }
@@ -187,6 +207,24 @@ export default class EventEdit extends AbstractSmartComponent {
     });
   }
 
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+    return parseFormData(formData);
+  }
+
+  removeElement() {
+    if (this._flatpickrStartDate || this._flatpickrEndDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrEndDate.destroy();
+      this._flatpickrStartDate = null;
+      this._flatpickrEndDate = null;
+      this._clickHandler = null;
+    }
+
+    super.removeElement();
+  }
+
   rerender() {
     super.rerender();
 
@@ -197,13 +235,28 @@ export default class EventEdit extends AbstractSmartComponent {
     this.setSubmitHandler(this._submitHandler);
     this.setFavoritesButtonClickHandler(this._favoritesClickHandler);
     this.setClickHandler(this._clickHandler);
-    this.setCloseHandler(this._closeHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
+  reset() {
+    const cardData = this._cardData;
+
+    this._type = cardData.type;
+    this._city = cardData.city;
+    this._description = cardData.description;
+    this._photos = cardData.photos;
+    this._services = cardData.services;
+
+    this.rerender();
+  }
+
   setClickHandler(handler) {
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
-    this._clickHandler = handler;
+    const element = this.getElement().querySelector(`.event__rollup-btn`);
+    if (element) {
+      element.addEventListener(`click`, handler);
+      this._clickHandler = handler;
+    }
   }
 
   setSubmitHandler(handler) {
@@ -211,9 +264,11 @@ export default class EventEdit extends AbstractSmartComponent {
     this._submitHandler = handler;
   }
 
-  setCloseHandler(handler) {
+
+  setDeleteButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
-    this._closeHandler = handler;
+
+    this._deleteButtonClickHandler = handler;
   }
 
   setFavoritesButtonClickHandler(handler) {
