@@ -1,3 +1,4 @@
+import moment from "moment";
 import {renderElement, RenderPosition, remove, replace} from "../utils/render.js";
 import {getRandomDate} from "../mock/card.js";
 import Event from "../components/event.js";
@@ -20,6 +21,15 @@ export const EmptyPoint = {
   end: Math.max(getRandomDate(), getRandomDate()),
   price: 0,
   isFavorite: false
+};
+
+const parseFormData = (formData) => {
+  return {
+    city: formData.get(`event-destination`),
+    start: moment(formData.get(`event-start-time`), `DD/MM/YYYY HH:mm`),
+    end: moment(formData.get(`event-end-time`), `DD/MM/YYYY HH:mm`),
+    price: formData.get(`event-price`)
+  };
 };
 
 export default class PointController {
@@ -53,7 +63,8 @@ export default class PointController {
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._eventEditComponent.getData();
+      const formData = this._eventEditComponent.getData();
+      const data = parseFormData(formData);
       this._onDataChange(this, _point, Object.assign({}, _point, data));
       this._replaceEditToTask();
     });

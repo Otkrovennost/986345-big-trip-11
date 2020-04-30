@@ -49,6 +49,7 @@ export default class TripController {
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
@@ -62,28 +63,9 @@ export default class TripController {
     } else {
       renderElement(container, this._sortComponent, RenderPosition.AFTERBEGIN);
       renderElement(container, this._daysContainer, RenderPosition.BEFOREEND);
+
       this._pointsControllers = renderPoints(points, this._daysContainer, this._onDataChange, this._onViewChange);
-
-      this._sortComponent.setSortTypeChangeHandler((sortType) => {
-        let sortedPoints = [];
-        let isDefaultSorting = false;
-
-        switch (sortType) {
-          case SortType.EVENT:
-            sortedPoints = points.slice();
-            isDefaultSorting = true;
-            break;
-          case SortType.PRICE:
-            sortedPoints = points.slice().sort((a, b) => b.price - a.price);
-            break;
-          case SortType.TIME:
-            sortedPoints = points.slice().sort((a, b) => (b.end - b.start) - (a.end - a.start));
-            break;
-        }
-
-        this._daysContainer.getElement().innerHTML = ``;
-        this._pointsControllers = renderPoints(sortedPoints, this._daysContainer, this._onDataChange, this._onViewChange, isDefaultSorting);
-      });
+      this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     }
   }
 
@@ -106,6 +88,7 @@ export default class TripController {
   _updatePoints() {
     this._removePoints();
     this._pointsControllers = renderPoints(this._pointsModel.getPoints(), this._daysContainer, this._onDataChange, this._onViewChange);
+    this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -120,6 +103,7 @@ export default class TripController {
         pointController.render(newData, PointControllerMode.DEFAULT);
 
         this._pointsControllers = [].concat(pointController, this._pointsControllers);
+        this._updatePoints();
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);
@@ -128,9 +112,32 @@ export default class TripController {
       const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
       if (isSuccess) {
-        pointController.render(newData, PointControllerMode.DEFAULT);
+        // pointController.render(newData, PointControllerMode.DEFAULT);
+        this._updatePoints();
       }
     }
+  }
+
+  _onSortTypeChange(sortType) {
+    let sortedPoints = [];
+    let isDefaultSorting = false;
+    const points = this._pointsModel.getPoints();
+
+    switch (sortType) {
+      case SortType.EVENT:
+        sortedPoints = points.slice();
+        isDefaultSorting = true;
+        break;
+      case SortType.PRICE:
+        sortedPoints = points.slice().sort((a, b) => b.price - a.price);
+        break;
+      case SortType.TIME:
+        sortedPoints = points.slice().sort((a, b) => (b.end - b.start) - (a.end - a.start));
+        break;
+    }
+
+    this._removePoints();
+    this._pointsControllers = renderPoints(sortedPoints, this._daysContainer, this._onDataChange, this._onViewChange, isDefaultSorting);
   }
 
   _onViewChange() {

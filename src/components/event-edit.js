@@ -4,6 +4,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 
 import {EmptyPoint} from '../controllers/point-controller.js';
+import {clearString} from "../utils/common.js";
 import {actionByType} from "../utils/data.js";
 import {cities, routeTypes, getRandomDescription, getRandomPhotos, getRandomServices} from "../mock/card.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
@@ -51,9 +52,9 @@ const getPhotosList = (arr) => {
   }).join(``);
 };
 
-const getCities = (arr) => {
+const getCities = (arr, elem) => {
   return arr.map((cityName) => {
-    return (`<option value="${cityName}"></option>`);
+    return (`<option value=${cityName} ${cityName === elem ? `selected` : ``}>${cityName}</option>`);
   }).join(``);
 };
 
@@ -72,7 +73,7 @@ const createEditEventTemplate = (cardData, option) => {
   const typeActivity = getTypeActivity(routeTypes[1]);
   const servicesList = getServices(services);
   const photosList = getPhotosList(photos);
-  const citiesList = getCities(cities);
+  const citiesList = getCities(cities, city);
   const isFavourite = isFavorite ? `checked` : ``;
 
   return (
@@ -99,13 +100,14 @@ const createEditEventTemplate = (cardData, option) => {
         </div>
 
         <div class="event__field-group  event__field-group--destination">
-          <label class="event__label  event__type-output" for="event-destination-${index}">
+          <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-${index}" type="text" name="event-destination" value="${city}" list="destination-list-${index}">
-          <datalist id="destination-list-${index}">
+          <select class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
+          <datalist id="destination-list-1">
           ${citiesList}
           </datalist>
+          </select>
         </div>
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">
@@ -124,7 +126,7 @@ const createEditEventTemplate = (cardData, option) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-${index}" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-${index}"  type="text" name="event-price" maxlength="5" value="${price}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -165,15 +167,6 @@ const createEditEventTemplate = (cardData, option) => {
   );
 };
 
-const parseFormData = (formData) => {
-  return {
-    city: formData.get(`event-destination`),
-    start: flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`),
-    end: flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`),
-    price: formData.get(`event-price`)
-  };
-};
-
 export default class EventEdit extends AbstractSmartComponent {
   constructor(cardData) {
     super();
@@ -209,8 +202,7 @@ export default class EventEdit extends AbstractSmartComponent {
 
   getData() {
     const form = this.getElement();
-    const formData = new FormData(form);
-    return parseFormData(formData);
+    return new FormData(form);
   }
 
   removeElement() {
@@ -293,6 +285,10 @@ export default class EventEdit extends AbstractSmartComponent {
       this._services = getRandomServices();
 
       this.rerender();
+    });
+
+    element.querySelector(`.event__input--price`).addEventListener(`input`, (evt) => {
+      evt.target.value = clearString(evt.target.value);
     });
   }
 
