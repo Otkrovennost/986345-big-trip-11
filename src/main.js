@@ -37,5 +37,3 @@ const tripInfoRoute = tripInfoBlock.querySelector(`.trip-main__trip-info`);
 
 renderElement(tripInfoRoute, new TripRoute(citiesList, datesList), RenderPosition.BEFOREEND);
 renderElement(tripInfoRoute, new TripCost(cardsList), RenderPosition.BEFOREEND);
-
-// const inputPrice = document.querySelector(`.event__input--price`);
