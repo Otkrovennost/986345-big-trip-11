@@ -21,3 +21,7 @@ export const getDurationTime = (timeInMs) => {
 
   return `${modifiedDays}${modifiedHours}${minutes}M`;
 };
+
+export const clearString = (str) => {
+  return str.replace(/[^+\d]/g, ``);
+};

@@ -4,13 +4,13 @@ import DaysList from "../components/days-list.js";
 import Day from "../components/day.js";
 import NoTasksComponent from "../components/no-tasks.js";
 import {sortOptions} from "../mock/sort.js";
-import PointController from "./point-controller.js";
+import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point-controller.js";
 
-const renderCards = (cards, container, onDataChange, onViewChange, isDefaultSorting = true) => {
+const renderPoints = (points, container, onDataChange, onViewChange, isDefaultSorting = true) => {
   const pointControllers = [];
 
   const dates = isDefaultSorting
-    ? [...new Set(cards.map((elem) => new Date(elem.start).toDateString()))]
+    ? [...new Set(points.map((elem) => new Date(elem.start).toDateString()))]
     : [true];
 
   dates.forEach((date, dateIndex) => {
@@ -20,11 +20,11 @@ const renderCards = (cards, container, onDataChange, onViewChange, isDefaultSort
 
     const dayElement = day.getElement();
 
-    cards.filter((_card) => {
-      return isDefaultSorting ? new Date(_card.start).toDateString() === date : _card;
-    }).map((_card) => {
+    points.filter((_point) => {
+      return isDefaultSorting ? new Date(_point.start).toDateString() === date : _point;
+    }).map((_point) => {
       const pointController = new PointController(dayElement, onDataChange, onViewChange);
-      pointController.render(_card);
+      pointController.render(_point, PointControllerMode.DEFAULT);
       pointControllers.push(pointController);
 
       return pointController;
@@ -37,65 +37,114 @@ const renderCards = (cards, container, onDataChange, onViewChange, isDefaultSort
 };
 
 export default class TripController {
-  constructor(container) {
+  constructor(container, pointsModel) {
     this._container = container;
+    this._pointsModel = pointsModel;
 
-    this._cards = [];
     this._pointsControllers = [];
     this._noTasksComponent = new NoTasksComponent();
     this._sortComponent = new Sorting(sortOptions);
     this._daysContainer = new DaysList();
+    this._creatingPoint = null;
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
+    this._onFilterChange = this._onFilterChange.bind(this);
+    this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
-  render(cards) {
-    this._cards = cards;
+  render() {
+    const points = this._pointsModel.getPoints();
 
     const container = this._container;
 
-    if (this._cards.length === 0) {
+    if (points.length === 0) {
       renderElement(container, this._noTasksComponent, RenderPosition.BEFOREEND);
     } else {
       renderElement(container, this._sortComponent, RenderPosition.AFTERBEGIN);
       renderElement(container, this._daysContainer, RenderPosition.BEFOREEND);
-      this._pointsControllers = renderCards(this._cards, this._daysContainer, this._onDataChange, this._onViewChange);
 
-      this._sortComponent.setSortTypeChangeHandler((sortType) => {
-        let sortedTasks = [];
-        let isDefaultSorting = false;
-
-        switch (sortType) {
-          case SortType.EVENT:
-            sortedTasks = this._cards.slice();
-            isDefaultSorting = true;
-            break;
-          case SortType.PRICE:
-            sortedTasks = this._cards.slice().sort((a, b) => b.price - a.price);
-            break;
-          case SortType.TIME:
-            sortedTasks = this._cards.slice().sort((a, b) => (b.end - b.start) - (a.end - a.start));
-            break;
-        }
-
-        this._daysContainer.getElement().innerHTML = ``;
-        this._pointsControllers = renderCards(sortedTasks, this._daysContainer, this._onDataChange, this._onViewChange, isDefaultSorting);
-      });
+      this._pointsControllers = renderPoints(points, this._daysContainer, this._onDataChange, this._onViewChange);
+      this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     }
   }
 
-  _onDataChange(cardComponent, oldCardData, newCardData) {
-    const index = this._cards.findIndex((it) => it === oldCardData);
-
-    if (index === -1) {
+  createPoint() {
+    if (this._creatingPoint) {
       return;
     }
-    this._cards = [].concat(this._cards.slice(0, index), newCardData, this._cards.slice(index + 1));
 
-    cardComponent.render(this._cards[index]);
+    this._creatingPoint = new PointController(this._container, this._onDataChange, this._onViewChange);
+    this._creatingPoint.render(EmptyPoint, PointControllerMode.CREATING);
+    this._onViewChange();
+  }
+
+  _removePoints() {
+    this._daysContainer.getElement().innerHTML = ``;
+    this._pointsControllers.forEach((pointController) => pointController.destroy());
+    this._pointsControllers = [];
+  }
+
+  _updatePoints() {
+    this._removePoints();
+    this._pointsControllers = renderPoints(this._pointsModel.getPoints(), this._daysContainer, this._onDataChange, this._onViewChange);
+    this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
+  }
+
+  _onDataChange(pointController, oldData, newData) {
+
+    if (oldData === EmptyPoint) {
+      this._creatingPoint = null;
+      if (newData === null) {
+        pointController.destroy();
+        this._updatePoints();
+      } else {
+        this._pointsModel.addPoint(newData);
+        pointController.render(newData, PointControllerMode.DEFAULT);
+
+        this._pointsControllers = [].concat(pointController, this._pointsControllers);
+        this._updatePoints();
+      }
+    } else if (newData === null) {
+      this._pointsModel.removePoint(oldData.id);
+      this._updatePoints();
+    } else {
+      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+      if (isSuccess) {
+        // pointController.render(newData, PointControllerMode.DEFAULT);
+        this._updatePoints();
+      }
+    }
+  }
+
+  _onSortTypeChange(sortType) {
+    let sortedPoints = [];
+    let isDefaultSorting = false;
+    const points = this._pointsModel.getPoints();
+
+    switch (sortType) {
+      case SortType.EVENT:
+        sortedPoints = points.slice();
+        isDefaultSorting = true;
+        break;
+      case SortType.PRICE:
+        sortedPoints = points.slice().sort((a, b) => b.price - a.price);
+        break;
+      case SortType.TIME:
+        sortedPoints = points.slice().sort((a, b) => (b.end - b.start) - (a.end - a.start));
+        break;
+    }
+
+    this._removePoints();
+    this._pointsControllers = renderPoints(sortedPoints, this._daysContainer, this._onDataChange, this._onViewChange, isDefaultSorting);
   }
 
   _onViewChange() {
     this._pointsControllers.forEach((it) => it.setDefaultView());
+  }
+
+  _onFilterChange() {
+    this._updatePoints();
   }
 }

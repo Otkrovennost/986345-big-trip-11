@@ -10,3 +10,9 @@ export const actionByType = new Map([
   [`sightseeing`, `Sightseeing in`],
   [`restaurant`, `Restaurant in`]
 ]);
+
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};

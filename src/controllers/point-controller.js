@@ -1,10 +1,35 @@
-import {renderElement, RenderPosition, replace} from "../utils/render.js";
+import moment from "moment";
+import {renderElement, RenderPosition, remove, replace} from "../utils/render.js";
+import {getRandomDate} from "../mock/card.js";
 import Event from "../components/event.js";
 import EventEdit from "../components/event-edit.js";
 
-const Mode = {
+export const Mode = {
   DEFAULT: `default`,
-  EDIT: `edit`
+  EDIT: `edit`,
+  CREATING: `creating`
+};
+
+export const EmptyPoint = {
+  id: String(Math.floor(getRandomDate() + Math.random())),
+  type: `Bus to`,
+  city: ``,
+  photos: [],
+  description: ``,
+  services: [],
+  start: Math.min(getRandomDate(), getRandomDate()),
+  end: Math.max(getRandomDate(), getRandomDate()),
+  price: 0,
+  isFavorite: false
+};
+
+const parseFormData = (formData) => {
+  return {
+    city: formData.get(`event-destination`),
+    start: moment(formData.get(`event-start-time`), `DD/MM/YYYY HH:mm`),
+    end: moment(formData.get(`event-end-time`), `DD/MM/YYYY HH:mm`),
+    price: formData.get(`event-price`)
+  };
 };
 
 export default class PointController {
@@ -21,12 +46,13 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(_card) {
+  render(_point, mode) {
     const oldEventComponent = this._eventComponent;
     const oldEventEditComponent = this._eventEditComponent;
+    this._mode = mode;
 
-    this._eventComponent = new Event(_card);
-    this._eventEditComponent = new EventEdit(_card);
+    this._eventComponent = new Event(_point);
+    this._eventEditComponent = new EventEdit(_point);
 
     const eventsList = this._container.querySelector(`.trip-events__list`);
 
@@ -37,25 +63,38 @@ export default class PointController {
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
+      const formData = this._eventEditComponent.getData();
+      const data = parseFormData(formData);
+      this._onDataChange(this, _point, Object.assign({}, _point, data));
       this._replaceEditToTask();
     });
 
-    this._eventEditComponent.setCloseHandler((evt) => {
-      evt.preventDefault();
-      this._replaceEditToTask();
-    });
+    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, _point, null));
 
     this._eventEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, _card, Object.assign({}, _card, {
-        isFavorite: !_card.isFavorite,
+      this._onDataChange(this, _point, Object.assign({}, _point, {
+        isFavorite: !_point.isFavorite,
       }));
+      this._mode = Mode.EDIT;
     });
 
-    if (oldEventComponent && oldEventEditComponent) {
-      replace(this._eventComponent, oldEventComponent);
-      replace(this._eventEditComponent, oldEventEditComponent);
-    } else {
-      renderElement(eventsList, this._eventComponent, RenderPosition.BEFOREEND);
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldEventComponent && oldEventEditComponent) {
+          replace(this._eventComponent, oldEventComponent);
+          replace(this._eventEditComponent, oldEventEditComponent);
+        } else {
+          renderElement(eventsList, this._eventComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.CREATING:
+        if (oldEventComponent && oldEventEditComponent) {
+          remove(oldEventComponent);
+          remove(oldEventEditComponent);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        renderElement(eventsList, this._eventEditComponent, RenderPosition.AFTERBEGIN);
+        break;
     }
   }
 
@@ -65,6 +104,12 @@ export default class PointController {
     }
   }
 
+  destroy() {
+    remove(this._eventEditComponent);
+    remove(this._eventComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
   _replaceTaskToEdit() {
     this._onViewChange();
     replace(this._eventEditComponent, this._eventComponent);
@@ -72,6 +117,7 @@ export default class PointController {
   }
 
   _replaceEditToTask() {
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
     replace(this._eventComponent, this._eventEditComponent);
     this._mode = Mode.DEFAULT;
   }
@@ -80,6 +126,9 @@ export default class PointController {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
+      if (this._mode === Mode.CREATING) {
+        this._onDataChange(this, EmptyPoint, null);
+      }
       this._replaceEditToTask();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }

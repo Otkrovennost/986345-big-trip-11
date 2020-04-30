@@ -1,5 +1,4 @@
 import moment from "moment";
-
 import {getDurationTime} from "../utils/common.js";
 import AbstractComponent from "./abstract-component.js";
 
