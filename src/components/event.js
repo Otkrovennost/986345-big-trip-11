@@ -1,23 +1,25 @@
 import moment from "moment";
-import {getDurationTime} from "../utils/common.js";
-import AbstractComponent from "./abstract-component.js";
+import {getDurationTime, getUpperCaseFirstLetter} from '../utils/common.js';
+import {actionByTypeToPlaceholder} from '../utils/data.js';
+import AbstractComponent from './abstract-component.js';
 
-const getServices = (arr) => {
-  return arr.map((service) => {
+const SHOWED_OFFERS = 3;
+const getOffers = (arr) => {
+  return arr.slice(0, SHOWED_OFFERS).map((offers) => {
     return (
       `<li class="event__offer">
-        <span class="event__offer-title">${service.title}</span>
+        <span class="event__offer-title">${offers.title}</span>
         &plus;
-        &euro;&nbsp;<span class="event__offer-price">${service.price}</span>
+        &euro;&nbsp;<span class="event__offer-price">${offers.price}</span>
       </li>`
     );
   }).join(``);
 };
 
-const createEventTemplate = (cardData) => {
+const createEventTemplate = (point) => {
 
-  const {type, price, city, start, end, services} = cardData;
-  const servicesList = getServices(services);
+  const {type, price, city, start, end, offers} = point;
+  const offersList = getOffers(offers);
   const startDate = moment(start).format(`YYYY-MM-DDThh:mm:ss`);
   const endDate = moment(end).format(`YYYY-MM-DDThh:mm:ss`);
   const startTime = moment(start).format(`HH:mm`);
@@ -29,9 +31,9 @@ const createEventTemplate = (cardData) => {
     `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${type.slice(0, -3)}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${city}</h3>
+        <h3 class="event__title">${getUpperCaseFirstLetter(type)} ${actionByTypeToPlaceholder[getUpperCaseFirstLetter(type)]} ${city}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
@@ -48,7 +50,7 @@ const createEventTemplate = (cardData) => {
 
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-        ${servicesList}
+        ${offersList}
         </ul>
 
         <button class="event__rollup-btn" type="button">
@@ -60,15 +62,15 @@ const createEventTemplate = (cardData) => {
 };
 
 export default class Event extends AbstractComponent {
-  constructor(cardData) {
+  constructor(point) {
     super();
 
-    this._cardData = cardData;
+    this._point = point;
     this._element = null;
   }
 
   getTemplate() {
-    return createEventTemplate(this._cardData);
+    return createEventTemplate(this._point);
   }
 
   setClickHandler(handler) {

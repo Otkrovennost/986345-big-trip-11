@@ -1,4 +1,4 @@
-import {getRandomArrayItem, getRandomIntegerNumber} from "../utils/common.js";
+import {getRandomArrayItem, getRandomIntegerNumber} from '../utils/common.js';
 
 const CADRS_AMOUNT = 20;
 
@@ -27,7 +27,7 @@ export const cities = [
   `Glasgow`,
 ];
 
-const services = [
+const offers = [
   {
     type: `luggage`,
     title: `Add luggage`,
@@ -82,14 +82,14 @@ export const getRandomDescription = () => {
     .trim();
 };
 
-export const getRandomServices = () => {
-  const currentServices = [];
+export const getRandomOffers = () => {
+  const currentOffers = [];
 
   for (let i = 0; i < getRandomIntegerNumber(0, 4); i++) {
-    currentServices.push(services[i]);
+    currentOffers.push(offers[i]);
   }
 
-  return currentServices;
+  return currentOffers;
 };
 
 export const getRandomDate = () => {
@@ -118,7 +118,7 @@ const generateCard = () => {
     city: getRandomArrayItem(cities),
     photos: getRandomPhotos(),
     description: getRandomDescription(),
-    services: getRandomServices(),
+    offers: getRandomOffers(),
     start: Math.min(startDate, endDate),
     end: Math.max(startDate, endDate),
     price: getRandomIntegerNumber(10, 100),

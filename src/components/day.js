@@ -1,5 +1,5 @@
 import moment from "moment";
-import AbstractComponent from "./abstract-component.js";
+import AbstractComponent from './abstract-component.js';
 
 const createCardTemplate = (date, index) => {
 

@@ -25,3 +25,9 @@ export const getDurationTime = (timeInMs) => {
 export const clearString = (str) => {
   return str.replace(/[^+\d]/g, ``);
 };
+
+export const getUpperCaseFirstLetter = (type) => {
+  return (
+    type[0].toUpperCase() + type.slice(1, type.length)
+  );
+};

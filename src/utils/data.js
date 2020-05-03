@@ -1,15 +1,15 @@
-export const actionByType = new Map([
-  [`taxi`, `Taxi to`],
-  [`bus`, `Bus to`],
-  [`train`, `Train to`],
-  [`ship`, `Ship to`],
-  [`transport`, `Transport to`],
-  [`drive`, `Drive to`],
-  [`flight`, `Flight to`],
-  [`check-in`, `Check-in in`],
-  [`sightseeing`, `Sightseeing in`],
-  [`restaurant`, `Restaurant in`]
-]);
+export const actionByTypeToPlaceholder = {
+  'Taxi': `to`,
+  'Bus': `to`,
+  'Train': `to`,
+  'Ship': `to`,
+  'Transport': `to`,
+  'Drive': `to`,
+  'Flight': `to`,
+  'Check-in': `in`,
+  'Sightseeing': `in`,
+  'Restaurant': `in`
+};
 
 export const FilterType = {
   EVERYTHING: `everything`,

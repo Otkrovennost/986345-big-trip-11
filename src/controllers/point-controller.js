@@ -1,8 +1,10 @@
 import moment from "moment";
-import {renderElement, RenderPosition, remove, replace} from "../utils/render.js";
-import {getRandomDate} from "../mock/card.js";
-import Event from "../components/event.js";
-import EventEdit from "../components/event-edit.js";
+import {renderElement, RenderPosition, remove, replace} from '../utils/render.js';
+import {getRandomDate} from '../mock/card.js';
+import Event from '../components/event.js';
+import EventEdit from '../components/event-edit.js';
+import PointModel from '../models/point.js';
+import Store from '../models/store.js';
 
 export const Mode = {
   DEFAULT: `default`,
@@ -12,11 +14,11 @@ export const Mode = {
 
 export const EmptyPoint = {
   id: String(Math.floor(getRandomDate() + Math.random())),
-  type: `Bus to`,
+  type: `bus`,
   city: ``,
   photos: [],
   description: ``,
-  services: [],
+  offers: [],
   start: Math.min(getRandomDate(), getRandomDate()),
   end: Math.max(getRandomDate(), getRandomDate()),
   price: 0,
@@ -24,12 +26,33 @@ export const EmptyPoint = {
 };
 
 const parseFormData = (formData) => {
-  return {
-    city: formData.get(`event-destination`),
-    start: moment(formData.get(`event-start-time`), `DD/MM/YYYY HH:mm`),
-    end: moment(formData.get(`event-end-time`), `DD/MM/YYYY HH:mm`),
-    price: formData.get(`event-price`)
-  };
+  const selectedOffers = [
+    ...document.querySelectorAll(`.event__offer-checkbox:checked + label[for^="event"]`)
+  ];
+
+  const destination = Store.getDestinations().find((city) => city.name === formData.get(`event-destination`));
+
+  return new PointModel({
+    'base_price': Number(formData.get(`event-price`)),
+    'date_from': new Date(
+        moment(formData.get(`event-start-time`), `DD/MM/YYYY HH:mm`).valueOf()
+    ).toISOString(),
+    'date_to': new Date(
+        moment(formData.get(`event-end-time`), `DD/MM/YYYY HH:mm`).valueOf()
+    ).toISOString(),
+    'destination': {
+      'description': destination.description,
+      'name': destination.name,
+      'pictures': destination.pictures
+    },
+    'id': `0`,
+    'is_favorite': formData.get(`event-favorite`) ? true : false,
+    'offers': selectedOffers.map((offer) => ({
+      'title': offer.querySelector(`.event__offer-title`).textContent,
+      'price': Number(offer.querySelector(`.event__offer-price`).textContent)
+    })),
+    'type': formData.get(`event-type`)
+  });
 };
 
 export default class PointController {
@@ -65,16 +88,16 @@ export default class PointController {
       evt.preventDefault();
       const formData = this._eventEditComponent.getData();
       const data = parseFormData(formData);
-      this._onDataChange(this, _point, Object.assign({}, _point, data));
+      this._onDataChange(this, _point, data);
       this._replaceEditToTask();
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, _point, null));
 
     this._eventEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, _point, Object.assign({}, _point, {
-        isFavorite: !_point.isFavorite,
-      }));
+      const newPoint = PointModel.clone(_point);
+      newPoint.isFavorite = !newPoint.isFavorite;
+      this._onDataChange(this, _point, newPoint);
       this._mode = Mode.EDIT;
     });
 
