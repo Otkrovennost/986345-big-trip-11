@@ -1,4 +1,4 @@
-import {FilterType} from "./data.js";
+import {FilterType} from './data.js';
 
 export const getPastPoints = (points) => {
   return points.filter((point) => point.end < Date.now());

@@ -1,13 +1,13 @@
 import moment from "moment";
-import flatpickr from "flatpickr";
+import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
-
 import {EmptyPoint} from '../controllers/point-controller.js';
-import {clearString} from "../utils/common.js";
-import {actionByType} from "../utils/data.js";
-import {cities, routeTypes, getRandomDescription, getRandomPhotos, getRandomServices} from "../mock/card.js";
-import AbstractSmartComponent from "./abstract-smart-component.js";
+import {clearString, getUpperCaseFirstLetter} from '../utils/common.js';
+import {actionByTypeToPlaceholder} from '../utils/data.js';
+import {routeTypes} from '../mock/card.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
+import Store from '../models/store.js';
 
 const getTypeTransport = (arr) => {
   return arr.map((typeTransport) => {
@@ -31,15 +31,15 @@ const getTypeActivity = (arr) => {
   }).join(``);
 };
 
-const getServices = (arr) => {
-  return arr.map((service) => {
+const getOffers = (arr) => {
+  return arr.map((offer) => {
     return (`
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${service.type}-1" type="checkbox" name="event-offer-${service.type}" checked>
-        <label class="event__offer-label" for="event-offer-${service.type}-1">
-        <span class="event__offer-title">${service.title}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}" type="checkbox" name="event-${offer.title}"  ${offer.isChecked ? `checked` : ``}>
+        <label class="event__offer-label" for="event-${offer.title}">
+        <span class="event__offer-title">${offer.title}</span>
         &plus;
-        &euro;&nbsp;<span class="event__offer-price">${service.price}</span>
+        &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
         </label>
       </div>`
     );
@@ -48,30 +48,34 @@ const getServices = (arr) => {
 
 const getPhotosList = (arr) => {
   return arr.map((photo) => {
-    return (`<img class="event__photo" src="${photo}" alt="Event photo">`);
+    return (`<img class="event__photo" src="${photo.src}" alt="${photo.description}">`);
   }).join(``);
 };
 
 const getCities = (arr, elem) => {
   return arr.map((cityName) => {
-    return (`<option value=${cityName} ${cityName === elem ? `selected` : ``}>${cityName}</option>`);
+    return (`<option value="${cityName}" ${cityName === elem ? `selected` : ``}>${cityName}</option>`);
   }).join(``);
 };
 
-const createEditEventTemplate = (cardData, option) => {
+const createEditEventTemplate = (point, options) => {
+
+  const {start, end, price, isFavorite, index} = point;
+  const {type, city, description, photos, offers} = options;
 
   let creatingPoint = false;
 
-  if (cardData === EmptyPoint) {
+  if (point === EmptyPoint) {
     creatingPoint = true;
   }
-  const {start, end, price, isFavorite, index} = cardData;
-  const {type, city, description, photos, services} = option;
+
+  const cities = Store.getDestinations().map((destination) => destination.name);
+
   const startDate = moment(start).format(`DD/MM/YY HH:mm`);
   const endDate = moment(end).format(`DD/MM/YY HH:mm`);
   const typeTransport = getTypeTransport(routeTypes[0]);
   const typeActivity = getTypeActivity(routeTypes[1]);
-  const servicesList = getServices(services);
+  const offersList = getOffers(offers);
   const photosList = getPhotosList(photos);
   const citiesList = getCities(cities, city);
   const isFavourite = isFavorite ? `checked` : ``;
@@ -79,12 +83,13 @@ const createEditEventTemplate = (cardData, option) => {
   return (
     `<form class="event  event--edit" action="#" method="post">
       <header class="event__header">
+      <input class="visually-hidden" name="event-current-type" id="event-current-type-name" value="${type}">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${type.slice(0, -3)}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -101,7 +106,7 @@ const createEditEventTemplate = (cardData, option) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-          ${type}
+          ${getUpperCaseFirstLetter(type)} ${actionByTypeToPlaceholder[getUpperCaseFirstLetter(type)]}
           </label>
           <select class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
           <datalist id="destination-list-1">
@@ -143,40 +148,44 @@ const createEditEventTemplate = (cardData, option) => {
           <span class="visually-hidden">Open event</span>
         </button>`}
       </header>
-      <section class="event__details">
-        <section class="event__section  event__section--offers">
+
+      ${offers.length > 0 || description.length > 0 ?
+      `<section class="event__details">
+        ${offers.length > 0 ?
+      `<section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
           <div class="event__available-offers">
-          ${servicesList}
+          ${offersList}
           </div>
-        </section>
+        </section>` : ``}
 
-        <section class="event__section  event__section--destination">
+        ${description.length > 0 ?
+      `<section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${description}</p>
-
-          <div class="event__photos-container">
+          ${photos.length > 0 ?
+      `<div class="event__photos-container">
             <div class="event__photos-tape">
             ${photosList}
             </div>
-          </div>
-        </section>
-      </section>
+          </div>` : ``}
+        </section>` : ``}
+      </section>` : ``}
     </form>`
   );
 };
 
 export default class EventEdit extends AbstractSmartComponent {
-  constructor(cardData) {
+  constructor(point) {
     super();
 
-    this._cardData = cardData;
-    this._type = cardData.type;
-    this._city = cardData.city;
-    this._description = cardData.description;
-    this._photos = cardData.photos;
-    this._services = cardData.services;
+    this._point = point;
+    this._type = point.type;
+    this._city = point.city;
+    this._price = point.price;
+    this._description = point.description;
+    this._offers = [...point.offers];
+    this._photos = [...point.photos];
 
     this._element = null;
     this._flatpickrStartDate = null;
@@ -191,11 +200,11 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._cardData, {
+    return createEditEventTemplate(this._point, {
       type: this._type,
       city: this._city,
       description: this._description,
-      services: this._services,
+      offers: this._offers,
       photos: this._photos
     });
   }
@@ -232,13 +241,13 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   reset() {
-    const cardData = this._cardData;
+    const point = this._point;
 
-    this._type = cardData.type;
-    this._city = cardData.city;
-    this._description = cardData.description;
-    this._photos = cardData.photos;
-    this._services = cardData.services;
+    this._type = point.type;
+    this._city = point.city;
+    this._description = point.description;
+    this._photos = point.photos;
+    this._offers = point.offers;
 
     this.rerender();
   }
@@ -272,17 +281,17 @@ export default class EventEdit extends AbstractSmartComponent {
     const element = this.getElement();
 
     element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
-
-      this._type = actionByType.get(evt.target.value);
+      this._type = evt.target.value;
+      // console.log(this._type);
+      this._offers = Store.getOffers().find((offer) => offer.type === this._type).offers;
 
       this.rerender();
     });
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
       this._city = evt.target.value;
-      this._description = getRandomDescription();
-      this._photos = getRandomPhotos();
-      this._services = getRandomServices();
+      this._photos = Store.getDestinations().find((destination) => destination.name === this._city).pictures;
+      this._description = Store.getDestinations().find((destination) => destination.name === this._city).description;
 
       this.rerender();
     });
@@ -304,12 +313,12 @@ export default class EventEdit extends AbstractSmartComponent {
     const options = {
       allowInput: true,
       dateFormat: `d/m/y H:i`,
-      minDate: this._cardData.start,
+      minDate: this._point.start,
       enableTime: true
     };
 
-    this._flatpickrStartDate = flatpickr(element.querySelector(`#event-start-time-1`), Object.assign({}, options, {defaultDate: this._cardData.start}));
+    this._flatpickrStartDate = flatpickr(element.querySelector(`#event-start-time-1`), Object.assign({}, options, {defaultDate: this._point.start}));
 
-    this._flatpickrEndDate = flatpickr(element.querySelector(`#event-end-time-1`), Object.assign({}, options, {defaultDate: this._cardData.end}));
+    this._flatpickrEndDate = flatpickr(element.querySelector(`#event-end-time-1`), Object.assign({}, options, {defaultDate: this._point.end}));
   }
 }

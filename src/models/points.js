@@ -1,5 +1,5 @@
-import {getPointsByFilter} from "../utils/filter.js";
-import {FilterType} from "../utils/data.js";
+import {getPointsByFilter} from '../utils/filter.js';
+import {FilterType} from '../utils/data.js';
 
 export default class PointsModel {
   constructor() {

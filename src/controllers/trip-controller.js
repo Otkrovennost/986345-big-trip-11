@@ -1,10 +1,10 @@
-import {renderElement, RenderPosition} from "../utils/render.js";
-import Sorting, {SortType} from "../components/sorting.js";
-import DaysList from "../components/days-list.js";
-import Day from "../components/day.js";
-import NoTasksComponent from "../components/no-tasks.js";
-import {sortOptions} from "../mock/sort.js";
-import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point-controller.js";
+import {renderElement, RenderPosition} from '../utils/render.js';
+import Sorting, {SortType} from '../components/sorting.js';
+import DaysList from '../components/days-list.js';
+import Day from '../components/day.js';
+import NoTasksComponent from '../components/no-tasks.js';
+import {sortOptions} from '../mock/sort.js';
+import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
 
 const renderPoints = (points, container, onDataChange, onViewChange, isDefaultSorting = true) => {
   const pointControllers = [];
@@ -37,9 +37,10 @@ const renderPoints = (points, container, onDataChange, onViewChange, isDefaultSo
 };
 
 export default class TripController {
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, api) {
     this._container = container;
     this._pointsModel = pointsModel;
+    this._api = api;
 
     this._pointsControllers = [];
     this._noTasksComponent = new NoTasksComponent();
@@ -96,25 +97,36 @@ export default class TripController {
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
-        pointController.destroy();
-        this._updatePoints();
+        this._api.deletePoint(oldData.id)
+        .then(() => {
+          pointController.destroy();
+          this._updatePoints();
+        });
       } else {
-        this._pointsModel.addPoint(newData);
-        pointController.render(newData, PointControllerMode.DEFAULT);
-
-        this._pointsControllers = [].concat(pointController, this._pointsControllers);
-        this._updatePoints();
+        this._api.createPoint(newData)
+          .then((pointModel) => {
+            this._pointsModel.addPoint(pointModel);
+            // pointsController.render(pointModel, PointControllerMode.DEFAULT);
+            this._pointsControllers = [].concat(pointController, this._pointsControllers);
+            this._updatePoints();
+          });
       }
     } else if (newData === null) {
-      this._pointsModel.removePoint(oldData.id);
-      this._updatePoints();
+      this._api.deletePoint(oldData.id)
+        .then(() => {
+          this._pointsModel.removePoint(oldData.id);
+          this._updatePoints();
+        });
     } else {
-      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+      this._api.updatePoint(oldData.id, newData)
+        .then((pointModel) => {
+          const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
-      if (isSuccess) {
-        // pointController.render(newData, PointControllerMode.DEFAULT);
-        this._updatePoints();
-      }
+          if (isSuccess) {
+            // pointsController.render(pointModel, PointControllerMode.DEFAULT);
+            this._updatePoints();
+          }
+        });
     }
   }
 

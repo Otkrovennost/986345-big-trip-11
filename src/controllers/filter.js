@@ -1,6 +1,6 @@
-import Filter from "../components/filter.js";
-import {FilterType} from "../utils/data.js";
-import {renderElement, replace, RenderPosition} from "../utils/render.js";
+import Filter from '../components/filter.js';
+import {FilterType} from '../utils/data.js';
+import {renderElement, replace, RenderPosition} from '../utils/render.js';
 
 export default class FilterController {
   constructor(container, pointsModel) {
