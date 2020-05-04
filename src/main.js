@@ -10,7 +10,7 @@ import PointsModel from './models/points.js';
 import API from './api.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const AUTHORIZATION = `Basic ag0e841gth789djfgc`;
+const AUTHORIZATION = `Basic ag78gfdsdgth78956ggh`;
 const tripControls = document.querySelector(`.trip-main__trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 // const tripInfoBlock = document.querySelector(`.trip-main`);
@@ -28,7 +28,6 @@ Promise.all([
   api.getDestinations(),
   api.getOffers()
 ]).then((res) => {
-  // console.log(res);
   pointsModel.setPoints(res[0]);
   tripController.render();
 });

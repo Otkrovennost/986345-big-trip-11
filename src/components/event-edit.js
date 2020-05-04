@@ -83,12 +83,13 @@ const createEditEventTemplate = (point, options) => {
   return (
     `<form class="event  event--edit" action="#" method="post">
       <header class="event__header">
+      <input class="visually-hidden" name="event-current-type" id="event-current-type-name" value="${type}">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -281,6 +282,7 @@ export default class EventEdit extends AbstractSmartComponent {
 
     element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
       this._type = evt.target.value;
+      // console.log(this._type);
       this._offers = Store.getOffers().find((offer) => offer.type === this._type).offers;
 
       this.rerender();

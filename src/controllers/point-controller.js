@@ -51,7 +51,7 @@ const parseFormData = (formData) => {
       'title': offer.querySelector(`.event__offer-title`).textContent,
       'price': Number(offer.querySelector(`.event__offer-price`).textContent)
     })),
-    'type': formData.get(`event-type`)
+    'type': formData.get(`event-current-type`)
   });
 };
 
