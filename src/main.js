@@ -1,27 +1,33 @@
-import {renderElement, RenderPosition} from './utils/render.js';
-import {menuNames} from './mock/menu.js';
-import SiteMenu from './components/site-menu.js';
-import FilterController from './controllers/filter.js';
-import TripController from './controllers/trip-controller.js';
-// import TripInfo from './components/trip-info.js';
-// import TripRoute from './components/trip-route.js';
-// import TripCost from './components/trip-cost.js';
-import PointsModel from './models/points.js';
 import API from './api.js';
+import {renderElement, RenderPosition} from './utils/render.js';
+import SiteMenu, {MenuItem} from './components/site-menu.js';
+import FilterController from './controllers/filter-controller.js';
+import InfoController from "./controllers/info-controller.js";
+import PointsModel from './models/points.js';
+import StatisticsController from "./controllers/statistics-controller.js";
+import TripController from './controllers/trip-controller.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const AUTHORIZATION = `Basic ag78gfdsdgth78956ggh`;
+const AUTHORIZATION = `Basic ag78gfdsddfr56fdgh`;
 const tripControls = document.querySelector(`.trip-main__trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
-// const tripInfoBlock = document.querySelector(`.trip-main`);
-const siteMenu = new SiteMenu(menuNames);
+const tripInfoBlock = document.querySelector(`.trip-main`);
 const api = new API(END_POINT, AUTHORIZATION);
+const siteMenu = new SiteMenu();
 const pointsModel = new PointsModel();
-const filterController = new FilterController(tripControls, pointsModel, api);
 const tripController = new TripController(tripEvents, pointsModel, api);
+const filterController = new FilterController(tripControls, pointsModel, api);
 
 renderElement(tripControls, siteMenu, RenderPosition.AFTERBEGIN);
+
 filterController.render();
+
+const infoController = new InfoController(tripInfoBlock, pointsModel);
+infoController.render();
+
+const statisticsController = new StatisticsController(tripEvents, pointsModel);
+statisticsController.render();
+statisticsController.hide();
 
 Promise.all([
   api.getPoints(),
@@ -36,9 +42,19 @@ document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, ()
   tripController.createPoint();
 });
 
-// renderElement(tripInfoBlock, new TripInfo(), RenderPosition.AFTERBEGIN);
-
-// const tripInfoRoute = tripInfoBlock.querySelector(`.trip-main__trip-info`);
-
-// renderElement(tripInfoRoute, new TripRoute(citiesList, datesList), RenderPosition.BEFOREEND);
-// renderElement(tripInfoRoute, new TripCost(cardsList), RenderPosition.BEFOREEND);
+siteMenu.setOnChange((item) => {
+  switch (item) {
+    case MenuItem.TABLE:
+      siteMenu.setActiveItem(MenuItem.TABLE);
+      tripController._sortComponent.show();
+      tripController.show();
+      statisticsController.hide();
+      break;
+    case MenuItem.STATS:
+      siteMenu.setActiveItem(MenuItem.STATS);
+      tripController._sortComponent.hide();
+      tripController.hide();
+      statisticsController.show();
+      break;
+  }
+});

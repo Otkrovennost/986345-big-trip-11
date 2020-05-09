@@ -1,11 +1,11 @@
 import moment from "moment";
 import {renderElement, RenderPosition, remove, replace} from '../utils/render.js';
-import {getRandomDate} from '../mock/card.js';
 import Event from '../components/event.js';
 import EventEdit from '../components/event-edit.js';
 import PointModel from '../models/point.js';
 import Store from '../models/store.js';
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
 export const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
@@ -13,14 +13,14 @@ export const Mode = {
 };
 
 export const EmptyPoint = {
-  id: String(Math.floor(getRandomDate() + Math.random())),
+  id: String(Date.now() + Math.random()),
   type: `bus`,
   city: ``,
   photos: [],
   description: ``,
   offers: [],
-  start: Math.min(getRandomDate(), getRandomDate()),
-  end: Math.max(getRandomDate(), getRandomDate()),
+  start: new Date(),
+  end: new Date(),
   price: 0,
   isFavorite: false
 };
@@ -88,11 +88,23 @@ export default class PointController {
       evt.preventDefault();
       const formData = this._eventEditComponent.getData();
       const data = parseFormData(formData);
+      this._eventEditComponent.disableForm();
+      this._eventEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
       this._onDataChange(this, _point, data);
+      this._eventEditComponent.activeForm();
       this._replaceEditToTask();
     });
 
-    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, _point, null));
+    this._eventEditComponent.setDeleteButtonClickHandler(() => {
+      this._eventEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._onDataChange(this, _point, null);
+    });
 
     this._eventEditComponent.setFavoritesButtonClickHandler(() => {
       const newPoint = PointModel.clone(_point);
@@ -131,6 +143,21 @@ export default class PointController {
     remove(this._eventEditComponent);
     remove(this._eventComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  shake() {
+    this._eventEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._eventComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._eventEditComponent.getElement().style.animation = ``;
+      this._eventComponent.getElement().style.animation = ``;
+
+      this._eventEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _replaceTaskToEdit() {

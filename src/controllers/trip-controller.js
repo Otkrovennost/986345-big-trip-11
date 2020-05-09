@@ -3,7 +3,7 @@ import Sorting, {SortType} from '../components/sorting.js';
 import DaysList from '../components/days-list.js';
 import Day from '../components/day.js';
 import NoTasksComponent from '../components/no-tasks.js';
-import {sortOptions} from '../mock/sort.js';
+import {sortOptions} from '../utils/data.js';
 import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
 
 const renderPoints = (points, container, onDataChange, onViewChange, isDefaultSorting = true) => {
@@ -47,11 +47,25 @@ export default class TripController {
     this._sortComponent = new Sorting(sortOptions);
     this._daysContainer = new DaysList();
     this._creatingPoint = null;
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
+
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  hide() {
+    this._daysContainer.hide();
+  }
+
+  show() {
+    this._daysContainer.show();
+  }
+
+  getPoints() {
+    return this._pointsModel.getPoints();
   }
 
   render() {
@@ -97,25 +111,27 @@ export default class TripController {
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
-        this._api.deletePoint(oldData.id)
-        .then(() => {
-          pointController.destroy();
-          this._updatePoints();
-        });
+        pointController.destroy();
+        this._updatePoints();
       } else {
         this._api.createPoint(newData)
           .then((pointModel) => {
             this._pointsModel.addPoint(pointModel);
-            // pointsController.render(pointModel, PointControllerMode.DEFAULT);
             this._pointsControllers = [].concat(pointController, this._pointsControllers);
             this._updatePoints();
-          });
+          })
+        .catch(() => {
+          pointController.shake();
+        });
       }
     } else if (newData === null) {
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
           this._updatePoints();
+        })
+        .catch(() => {
+          pointController.shake();
         });
     } else {
       this._api.updatePoint(oldData.id, newData)
@@ -123,9 +139,11 @@ export default class TripController {
           const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
           if (isSuccess) {
-            // pointsController.render(pointModel, PointControllerMode.DEFAULT);
             this._updatePoints();
           }
+        })
+        .catch(() => {
+          pointController.shake();
         });
     }
   }
