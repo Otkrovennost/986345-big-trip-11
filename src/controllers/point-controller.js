@@ -14,7 +14,7 @@ export const Mode = {
 
 export const EmptyPoint = {
   id: String(Date.now() + Math.random()),
-  type: `bus`,
+  type: `flight`,
   city: ``,
   photos: [],
   description: ``,
@@ -62,6 +62,7 @@ export default class PointController {
     this._onViewChange = onViewChange;
 
     this._mode = Mode.DEFAULT;
+    this._pointData = {};
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -74,10 +75,11 @@ export default class PointController {
     const oldEventEditComponent = this._eventEditComponent;
     this._mode = mode;
 
+    this._pointData = _point;
     this._eventComponent = new Event(_point);
     this._eventEditComponent = new EventEdit(_point);
 
-    const eventsList = this._container.querySelector(`.trip-events__list`);
+    // const eventsList = this._container.querySelector(`.trip-events__list`);
 
     this._eventComponent.setClickHandler(() => {
       this._replaceTaskToEdit();
@@ -95,22 +97,34 @@ export default class PointController {
 
       this._onDataChange(this, _point, data);
       this._eventEditComponent.activeForm();
-      this._replaceEditToTask();
+      // this._replaceEditToTask();
     });
 
-    this._eventEditComponent.setDeleteButtonClickHandler(() => {
+    this._eventEditComponent.setDeleteButtonClickHandler((evt) => {
+      evt.preventDefault();
+
       this._eventEditComponent.setData({
         deleteButtonText: `Deleting...`,
       });
+      this._eventEditComponent.disableForm();
+      if (this._mode === Mode.CREATING) {
+        this._onDataChange(this, EmptyPoint, null);
+      }
 
       this._onDataChange(this, _point, null);
+      this._eventEditComponent.activeForm();
     });
 
     this._eventEditComponent.setFavoritesButtonClickHandler(() => {
       const newPoint = PointModel.clone(_point);
       newPoint.isFavorite = !newPoint.isFavorite;
       this._onDataChange(this, _point, newPoint);
-      this._mode = Mode.EDIT;
+      // this._mode = Mode.EDIT;
+    });
+
+    this._eventEditComponent.setClickHandler((evt) => {
+      evt.preventDefault();
+      this._replaceEditToTask();
     });
 
     switch (mode) {
@@ -118,8 +132,9 @@ export default class PointController {
         if (oldEventComponent && oldEventEditComponent) {
           replace(this._eventComponent, oldEventComponent);
           replace(this._eventEditComponent, oldEventEditComponent);
+          this._replaceEditToTask();
         } else {
-          renderElement(eventsList, this._eventComponent, RenderPosition.BEFOREEND);
+          renderElement(this._container, this._eventComponent, RenderPosition.BEFOREEND);
         }
         break;
       case Mode.CREATING:
@@ -128,7 +143,7 @@ export default class PointController {
           remove(oldEventEditComponent);
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
-        renderElement(eventsList, this._eventEditComponent, RenderPosition.AFTERBEGIN);
+        renderElement(this._container, this._eventEditComponent, RenderPosition.BEFOREBEGIN);
         break;
     }
   }
@@ -168,7 +183,9 @@ export default class PointController {
 
   _replaceEditToTask() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
-    replace(this._eventComponent, this._eventEditComponent);
+    if (document.contains(this._eventEditComponent.getElement())) {
+      replace(this._eventComponent, this._eventEditComponent);
+    }
     this._mode = Mode.DEFAULT;
   }
 

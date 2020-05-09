@@ -1,14 +1,14 @@
 import API from './api.js';
-import {renderElement, RenderPosition} from './utils/render.js';
-import SiteMenu, {MenuItem} from './components/site-menu.js';
 import FilterController from './controllers/filter-controller.js';
 import InfoController from "./controllers/info-controller.js";
 import PointsModel from './models/points.js';
+import {renderElement, RenderPosition} from './utils/render.js';
+import SiteMenu, {MenuItem} from './components/site-menu.js';
 import StatisticsController from "./controllers/statistics-controller.js";
 import TripController from './controllers/trip-controller.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const AUTHORIZATION = `Basic ag78gfdsddfr56fdgh`;
+const AUTHORIZATION = `Basic yhty75dyhert56fdgh`;
 const tripControls = document.querySelector(`.trip-main__trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripInfoBlock = document.querySelector(`.trip-main`);
@@ -18,7 +18,7 @@ const pointsModel = new PointsModel();
 const tripController = new TripController(tripEvents, pointsModel, api);
 const filterController = new FilterController(tripControls, pointsModel, api);
 
-renderElement(tripControls, siteMenu, RenderPosition.AFTERBEGIN);
+renderElement(tripControls, siteMenu, RenderPosition.BEFOREEND);
 
 filterController.render();
 

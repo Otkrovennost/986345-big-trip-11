@@ -18,12 +18,10 @@ const renderPoints = (points, container, onDataChange, onViewChange, isDefaultSo
       ? new Day(date, dateIndex + 1)
       : new Day();
 
-    const dayElement = day.getElement();
-
     points.filter((_point) => {
       return isDefaultSorting ? new Date(_point.start).toDateString() === date : _point;
     }).map((_point) => {
-      const pointController = new PointController(dayElement, onDataChange, onViewChange);
+      const pointController = new PointController(day.getElement().querySelector(`.trip-events__list`), onDataChange, onViewChange);
       pointController.render(_point, PointControllerMode.DEFAULT);
       pointControllers.push(pointController);
 
@@ -71,13 +69,14 @@ export default class TripController {
   render() {
     const points = this._pointsModel.getPoints();
 
-    const container = this._container;
+    // const container = this._container;
+    console.log(this._container);
 
     if (points.length === 0) {
-      renderElement(container, this._noTasksComponent, RenderPosition.BEFOREEND);
+      renderElement(this._container, this._noTasksComponent, RenderPosition.BEFOREEND);
     } else {
-      renderElement(container, this._sortComponent, RenderPosition.AFTERBEGIN);
-      renderElement(container, this._daysContainer, RenderPosition.BEFOREEND);
+      renderElement(this._container, this._sortComponent, RenderPosition.BEFOREEND);
+      renderElement(this._container, this._daysContainer, RenderPosition.BEFOREEND);
 
       this._pointsControllers = renderPoints(points, this._daysContainer, this._onDataChange, this._onViewChange);
       this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
@@ -88,8 +87,9 @@ export default class TripController {
     if (this._creatingPoint) {
       return;
     }
-
-    this._creatingPoint = new PointController(this._container, this._onDataChange, this._onViewChange);
+    console.log(this._daysContainer.getElement());
+    this._creatingPoint = new PointController(this._daysContainer.getElement(), this._onDataChange, this._onViewChange);
+    console.log(this._creatingPoint);
     this._creatingPoint.render(EmptyPoint, PointControllerMode.CREATING);
     this._onViewChange();
   }
@@ -176,5 +176,6 @@ export default class TripController {
 
   _onFilterChange() {
     this._updatePoints();
+    this._createPoint = null;
   }
 }

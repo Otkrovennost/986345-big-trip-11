@@ -87,7 +87,7 @@ const createEditEventTemplate = (point, options) => {
   const saveButtonText = externalData.saveButtonText;
 
   return (
-    `<form class="event  event--edit" action="#" method="post">
+    `<form class="trip-events__item event event--edit" action="#" method="post">
       <header class="event__header">
       <input class="visually-hidden" name="event-current-type" id="event-current-type-name" value="${type}">
         <div class="event__type-wrapper">
