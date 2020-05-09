@@ -69,9 +69,6 @@ export default class TripController {
   render() {
     const points = this._pointsModel.getPoints();
 
-    // const container = this._container;
-    console.log(this._container);
-
     if (points.length === 0) {
       renderElement(this._container, this._noTasksComponent, RenderPosition.BEFOREEND);
     } else {
@@ -87,9 +84,7 @@ export default class TripController {
     if (this._creatingPoint) {
       return;
     }
-    console.log(this._daysContainer.getElement());
     this._creatingPoint = new PointController(this._daysContainer.getElement(), this._onDataChange, this._onViewChange);
-    console.log(this._creatingPoint);
     this._creatingPoint.render(EmptyPoint, PointControllerMode.CREATING);
     this._onViewChange();
   }
