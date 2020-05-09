@@ -4,10 +4,14 @@ import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 import {EmptyPoint} from '../controllers/point-controller.js';
 import {clearString, getUpperCaseFirstLetter} from '../utils/common.js';
-import {actionByTypeToPlaceholder} from '../utils/data.js';
-import {routeTypes} from '../mock/card.js';
+import {routeTypes, actionByTypeToPlaceholder} from '../utils/data.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import Store from '../models/store.js';
+
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
 
 const getTypeTransport = (arr) => {
   return arr.map((typeTransport) => {
@@ -61,7 +65,7 @@ const getCities = (arr, elem) => {
 const createEditEventTemplate = (point, options) => {
 
   const {start, end, price, isFavorite, index} = point;
-  const {type, city, description, photos, offers} = options;
+  const {type, city, description, photos, offers, externalData} = options;
 
   let creatingPoint = false;
 
@@ -79,6 +83,8 @@ const createEditEventTemplate = (point, options) => {
   const photosList = getPhotosList(photos);
   const citiesList = getCities(cities, city);
   const isFavourite = isFavorite ? `checked` : ``;
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   return (
     `<form class="event  event--edit" action="#" method="post">
@@ -134,8 +140,8 @@ const createEditEventTemplate = (point, options) => {
           <input class="event__input  event__input--price" id="event-price-${index}"  type="text" name="event-price" maxlength="5" value="${price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : `Delete`}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+        <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : deleteButtonText}</button>
         <input id="event-favorite-${index}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavourite}>
         <label class="event__favorite-btn ${creatingPoint ? `visually-hidden` : ``}" for="event-favorite-${index}">
           <span class="visually-hidden">Add to favorite</span>
@@ -186,6 +192,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this._description = point.description;
     this._offers = [...point.offers];
     this._photos = [...point.photos];
+    this._externalData = DefaultData;
 
     this._element = null;
     this._flatpickrStartDate = null;
@@ -205,13 +212,19 @@ export default class EventEdit extends AbstractSmartComponent {
       city: this._city,
       description: this._description,
       offers: this._offers,
-      photos: this._photos
+      photos: this._photos,
+      externalData: this._externalData
     });
   }
 
   getData() {
     const form = this.getElement();
     return new FormData(form);
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
   }
 
   removeElement() {
@@ -277,12 +290,27 @@ export default class EventEdit extends AbstractSmartComponent {
     this._favoritesClickHandler = handler;
   }
 
+  disableForm() {
+    const form = this.getElement();
+    const elements = Array.from(form.elements);
+    elements.forEach((elm) => {
+      elm.readOnly = true;
+    });
+  }
+
+  activeForm() {
+    const form = this.getElement();
+    const elements = Array.from(form.elements);
+    elements.forEach((elm) => {
+      elm.readOnly = false;
+    });
+  }
+
   _subscribeOnEvents() {
     const element = this.getElement();
 
     element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
       this._type = evt.target.value;
-      // console.log(this._type);
       this._offers = Store.getOffers().find((offer) => offer.type === this._type).offers;
 
       this.rerender();
@@ -310,6 +338,7 @@ export default class EventEdit extends AbstractSmartComponent {
     }
 
     const element = this.getElement();
+
     const options = {
       allowInput: true,
       dateFormat: `d/m/y H:i`,
