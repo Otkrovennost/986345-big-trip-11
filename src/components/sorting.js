@@ -29,7 +29,7 @@ export default class Sorting extends AbstractComponent {
 
     this._options = options;
     this._element = null;
-    this._currentSortType = SortType.DEFAULT;
+    this._currentSortType = SortType.EVENT;
   }
 
   getTemplate() {
@@ -40,9 +40,12 @@ export default class Sorting extends AbstractComponent {
     return this._currentSortType;
   }
 
+  // setSortType(sortType) {
+  //   this._currentSortType = sortType;
+  // }
+
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
-      evt.preventDefault();
 
       if (evt.target.tagName.toLowerCase() !== `label`) {
         return;

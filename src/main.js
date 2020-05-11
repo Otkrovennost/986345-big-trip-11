@@ -8,7 +8,7 @@ import StatisticsController from "./controllers/statistics-controller.js";
 import TripController from './controllers/trip-controller.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const AUTHORIZATION = `Basic yhty75dyhert56fdgh`;
+const AUTHORIZATION = `Basic gtytsakfe4gtvfd6fdgh`;
 const tripControls = document.querySelector(`.trip-main__trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripInfoBlock = document.querySelector(`.trip-main`);

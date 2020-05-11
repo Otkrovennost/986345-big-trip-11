@@ -62,10 +62,6 @@ export default class TripController {
     this._daysContainer.show();
   }
 
-  getPoints() {
-    return this._pointsModel.getPoints();
-  }
-
   render() {
     const points = this._pointsModel.getPoints();
 
@@ -98,11 +94,10 @@ export default class TripController {
   _updatePoints() {
     this._removePoints();
     this._pointsControllers = renderPoints(this._pointsModel.getPoints(), this._daysContainer, this._onDataChange, this._onViewChange);
-    this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
+    // this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
   _onDataChange(pointController, oldData, newData) {
-
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {

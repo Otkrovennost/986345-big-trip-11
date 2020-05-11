@@ -45,7 +45,6 @@ const parseFormData = (formData) => {
       'name': destination.name,
       'pictures': destination.pictures
     },
-    'id': `0`,
     'is_favorite': formData.get(`event-favorite`) ? true : false,
     'offers': selectedOffers.map((offer) => ({
       'title': offer.querySelector(`.event__offer-title`).textContent,
@@ -62,7 +61,6 @@ export default class PointController {
     this._onViewChange = onViewChange;
 
     this._mode = Mode.DEFAULT;
-    this._pointData = {};
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -75,11 +73,8 @@ export default class PointController {
     const oldEventEditComponent = this._eventEditComponent;
     this._mode = mode;
 
-    this._pointData = _point;
     this._eventComponent = new Event(_point);
     this._eventEditComponent = new EventEdit(_point);
-
-    // const eventsList = this._container.querySelector(`.trip-events__list`);
 
     this._eventComponent.setClickHandler(() => {
       this._replaceTaskToEdit();
@@ -97,7 +92,6 @@ export default class PointController {
 
       this._onDataChange(this, _point, data);
       this._eventEditComponent.activeForm();
-      // this._replaceEditToTask();
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler((evt) => {
@@ -119,12 +113,6 @@ export default class PointController {
       const newPoint = PointModel.clone(_point);
       newPoint.isFavorite = !newPoint.isFavorite;
       this._onDataChange(this, _point, newPoint);
-      // this._mode = Mode.EDIT;
-    });
-
-    this._eventEditComponent.setClickHandler((evt) => {
-      evt.preventDefault();
-      this._replaceEditToTask();
     });
 
     switch (mode) {
@@ -134,6 +122,7 @@ export default class PointController {
           replace(this._eventEditComponent, oldEventEditComponent);
           this._replaceEditToTask();
         } else {
+          console.log(this._eventComponent);
           renderElement(this._container, this._eventComponent, RenderPosition.BEFOREEND);
         }
         break;
@@ -182,10 +171,14 @@ export default class PointController {
   }
 
   _replaceEditToTask() {
+    this._eventEditComponent.reset();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    console.log(this._eventComponent);
+    console.log(this._eventEditComponent);
     if (document.contains(this._eventEditComponent.getElement())) {
       replace(this._eventComponent, this._eventEditComponent);
     }
+
     this._mode = Mode.DEFAULT;
   }
 

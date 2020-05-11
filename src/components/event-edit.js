@@ -193,6 +193,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this._offers = [...point.offers];
     this._photos = [...point.photos];
     this._externalData = DefaultData;
+    this._minEndDate = null;
 
     this._element = null;
     this._flatpickrStartDate = null;
@@ -258,9 +259,9 @@ export default class EventEdit extends AbstractSmartComponent {
 
     this._type = point.type;
     this._city = point.city;
-    this._description = point.description;
-    this._photos = point.photos;
-    this._offers = point.offers;
+    // this._description = point.description;
+    // this._photos = point.photos;
+    // this._offers = point.offers;
 
     this.rerender();
   }
@@ -293,16 +294,16 @@ export default class EventEdit extends AbstractSmartComponent {
   disableForm() {
     const form = this.getElement();
     const elements = Array.from(form.elements);
-    elements.forEach((elm) => {
-      elm.readOnly = true;
+    elements.forEach((elem) => {
+      elem.readOnly = true;
     });
   }
 
   activeForm() {
     const form = this.getElement();
     const elements = Array.from(form.elements);
-    elements.forEach((elm) => {
-      elm.readOnly = false;
+    elements.forEach((elem) => {
+      elem.readOnly = false;
     });
   }
 
@@ -327,6 +328,11 @@ export default class EventEdit extends AbstractSmartComponent {
     element.querySelector(`.event__input--price`).addEventListener(`input`, (evt) => {
       evt.target.value = clearString(evt.target.value);
     });
+
+    element.querySelector(`#event-start-time-1`).addEventListener(`change`, (evt) => {
+      const endDateInput = element.querySelector(`#event-end-time-1`);
+      endDateInput.value = evt.target.value;
+    });
   }
 
   _applyFlatpickr() {
@@ -349,5 +355,11 @@ export default class EventEdit extends AbstractSmartComponent {
     this._flatpickrStartDate = flatpickr(element.querySelector(`#event-start-time-1`), Object.assign({}, options, {defaultDate: this._point.start}));
 
     this._flatpickrEndDate = flatpickr(element.querySelector(`#event-end-time-1`), Object.assign({}, options, {defaultDate: this._point.end}));
+
+    const flatpickrEndDate = this._flatpickrEndDate;
+
+    this._flatpickrStartDate.config.onChange.push(function(selectedDates) {
+      flatpickrEndDate.set('minDate', selectedDates[0]);
+    });
   }
 }
