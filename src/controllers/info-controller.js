@@ -1,5 +1,5 @@
-import {renderElement, RenderPosition, replace} from "../utils/render.js";
 import Info from "../components/trip-info.js";
+import {renderElement, RenderPosition, replace} from "../utils/render.js";
 
 export default class InfoController {
   constructor(container, pointsModel) {

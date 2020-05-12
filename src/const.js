@@ -28,12 +28,6 @@ export const actionByTypeToPlaceholder = {
   'Restaurant': `in`
 };
 
-export const FilterType = {
-  EVERYTHING: `everything`,
-  FUTURE: `future`,
-  PAST: `past`
-};
-
 export const sortOptions = [
   {
     name: `event`,
@@ -48,3 +42,9 @@ export const sortOptions = [
     isChecked: false
   }
 ];
+
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};

@@ -6,8 +6,8 @@ const getFilterNameById = (id) => {
   return id.substring(FILTER_ID_DASH.length);
 };
 
-const createFilterMarkup = (filter, isChecked) => {
-  const {name} = filter;
+const createFilterMarkup = (filter) => {
+  const {name, isChecked} = filter;
 
   return (
     `<div class="trip-filters__filter">
@@ -18,7 +18,7 @@ const createFilterMarkup = (filter, isChecked) => {
 };
 
 const createFilterTemplate = (filters) => {
-  const filtersMarkup = filters.map((it) => createFilterMarkup(it, it.checked)).join(`\n`);
+  const filtersMarkup = filters.map((it) => createFilterMarkup(it, it.isChecked)).join(`\n`);
 
   return `<form class="trip-filters" action="#" method="get">
     ${filtersMarkup}
@@ -26,21 +26,39 @@ const createFilterTemplate = (filters) => {
 };
 
 export default class Filter extends AbstractComponent {
-  constructor(names) {
+  constructor(filters) {
     super();
 
-    this._names = names;
-    this._element = null;
+    this._filters = filters;
   }
 
   getTemplate() {
-    return createFilterTemplate(this._names);
+    return createFilterTemplate(this._filters);
   }
 
   setFilterChangeHandler(handler) {
-    this.getElement().addEventListener(`change`, (evt) => {
+    this.getElement().addEventListener(`click`, (evt) => {
       const filterName = getFilterNameById(evt.target.id);
       handler(filterName);
+      this._checkedFilterActive(evt.target);
     });
+  }
+
+  checkDefaultFilterForInput() {
+    const defaulFilterTypeInput = this.getElement().querySelector(`#filter-everything`);
+    this._checkedFilterActive(defaulFilterTypeInput);
+  }
+
+  _checkedFilterActive(filterItem) {
+    const filterItems = this.getElement().querySelectorAll(`.trip-filters__filter-input`);
+
+    for (const filterElement of filterItems) {
+      if (filterElement.hasAttribute(`checked`)) {
+        filterElement.removeAttribute(`checked`);
+        break;
+      }
+    }
+
+    filterItem.setAttribute(`checked`, `checked`);
   }
 }

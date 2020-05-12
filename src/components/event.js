@@ -1,11 +1,11 @@
 import moment from "moment";
-import {getDurationTime, getUpperCaseFirstLetter} from '../utils/common.js';
-import {actionByTypeToPlaceholder} from '../utils/data.js';
 import AbstractComponent from './abstract-component.js';
+import {actionByTypeToPlaceholder} from '../const.js';
+import {getDurationTime, getUpperCaseFirstLetter} from '../utils/common.js';
 
 const SHOWED_OFFERS = 3;
-const getOffers = (arr) => {
-  return arr.slice(0, SHOWED_OFFERS).map((offers) => {
+const getOffers = (array) => {
+  return array.slice(0, SHOWED_OFFERS).map((offers) => {
     return (
       `<li class="event__offer">
         <span class="event__offer-title">${offers.title}</span>

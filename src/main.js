@@ -8,7 +8,7 @@ import StatisticsController from "./controllers/statistics-controller.js";
 import TripController from './controllers/trip-controller.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const AUTHORIZATION = `Basic gtytsakfe4gtvfd6fdgh`;
+const AUTHORIZATION = `Basic gffrzfgfcdcd2tvfddfreh`;
 const tripControls = document.querySelector(`.trip-main__trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripInfoBlock = document.querySelector(`.trip-main`);
@@ -16,7 +16,8 @@ const api = new API(END_POINT, AUTHORIZATION);
 const siteMenu = new SiteMenu();
 const pointsModel = new PointsModel();
 const tripController = new TripController(tripEvents, pointsModel, api);
-const filterController = new FilterController(tripControls, pointsModel, api);
+const filterController = new FilterController(tripControls, pointsModel);
+const addNewEventButton = document.querySelector(`.trip-main__event-add-btn`);
 
 renderElement(tripControls, siteMenu, RenderPosition.BEFOREEND);
 
@@ -29,16 +30,18 @@ const statisticsController = new StatisticsController(tripEvents, pointsModel);
 statisticsController.render();
 statisticsController.hide();
 
-Promise.all([
-  api.getPoints(),
-  api.getDestinations(),
-  api.getOffers()
-]).then((res) => {
-  pointsModel.setPoints(res[0]);
+tripController.isLoading();
+
+api.getData().then((res) => {
+  pointsModel.setPoints(res);
+  tripController.isLoaded();
   tripController.render();
 });
 
-document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
+addNewEventButton.addEventListener(`click`, () => {
+  addNewEventButton.disabled = true;
+  tripController.rerender();
+  filterController.rerender();
   tripController.createPoint();
 });
 
@@ -46,14 +49,14 @@ siteMenu.setOnChange((item) => {
   switch (item) {
     case MenuItem.TABLE:
       siteMenu.setActiveItem(MenuItem.TABLE);
-      tripController._sortComponent.show();
       tripController.show();
+      filterController.show();
       statisticsController.hide();
       break;
     case MenuItem.STATS:
       siteMenu.setActiveItem(MenuItem.STATS);
-      tripController._sortComponent.hide();
       tripController.hide();
+      filterController.hide();
       statisticsController.show();
       break;
   }

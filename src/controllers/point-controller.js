@@ -1,8 +1,8 @@
 import moment from "moment";
-import {renderElement, RenderPosition, remove, replace} from '../utils/render.js';
 import Event from '../components/event.js';
 import EventEdit from '../components/event-edit.js';
 import PointModel from '../models/point.js';
+import {renderElement, RenderPosition, remove, replace} from '../utils/render.js';
 import Store from '../models/store.js';
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
@@ -92,6 +92,7 @@ export default class PointController {
 
       this._onDataChange(this, _point, data);
       this._eventEditComponent.activeForm();
+      this._activeAddNewIventButton();
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler((evt) => {
@@ -103,6 +104,7 @@ export default class PointController {
       this._eventEditComponent.disableForm();
       if (this._mode === Mode.CREATING) {
         this._onDataChange(this, EmptyPoint, null);
+        this._activeAddNewIventButton();
       }
 
       this._onDataChange(this, _point, null);
@@ -122,7 +124,6 @@ export default class PointController {
           replace(this._eventEditComponent, oldEventEditComponent);
           this._replaceEditToTask();
         } else {
-          console.log(this._eventComponent);
           renderElement(this._container, this._eventComponent, RenderPosition.BEFOREEND);
         }
         break;
@@ -173,12 +174,9 @@ export default class PointController {
   _replaceEditToTask() {
     this._eventEditComponent.reset();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
-    console.log(this._eventComponent);
-    console.log(this._eventEditComponent);
     if (document.contains(this._eventEditComponent.getElement())) {
       replace(this._eventComponent, this._eventEditComponent);
     }
-
     this._mode = Mode.DEFAULT;
   }
 
@@ -188,9 +186,15 @@ export default class PointController {
     if (isEscKey) {
       if (this._mode === Mode.CREATING) {
         this._onDataChange(this, EmptyPoint, null);
+        this._activeAddNewIventButton();
       }
       this._replaceEditToTask();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
+  }
+
+  _activeAddNewIventButton() {
+    const newAddIventButton = document.querySelector(`.trip-main__event-add-btn`);
+    newAddIventButton.disabled = false;
   }
 }

@@ -40,10 +40,9 @@ export default class Sorting extends AbstractComponent {
     return this._currentSortType;
   }
 
-  // setSortType(sortType) {
-  //   this._currentSortType = sortType;
-  // }
-
+  setSortType(sortType) {
+    this._currentSortType = sortType;
+  }
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
 
@@ -64,8 +63,13 @@ export default class Sorting extends AbstractComponent {
     });
   }
 
+  checkDefaultSortForInput() {
+    const defaulSortTypeInput = this.getElement().querySelector(`#sort-event`);
+    this._checkedSortItem(defaulSortTypeInput);
+  }
+
   _checkedSortItem(sortItem) {
-    const sortItems = this._element.querySelectorAll(`.trip-sort__input`);
+    const sortItems = this.getElement().querySelectorAll(`.trip-sort__input`);
 
     for (const sortElement of sortItems) {
       if (sortElement.hasAttribute(`checked`)) {
