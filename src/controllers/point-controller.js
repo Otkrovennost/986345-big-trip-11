@@ -5,6 +5,8 @@ import PointModel from '../models/point.js';
 import {renderElement, RenderPosition, remove, replace} from '../utils/render.js';
 import Store from '../models/store.js';
 
+const newAddIventButton = document.querySelector(`.trip-main__event-add-btn`);
+
 const SHAKE_ANIMATION_TIMEOUT = 600;
 export const Mode = {
   DEFAULT: `default`,
@@ -194,7 +196,6 @@ export default class PointController {
   }
 
   _activeAddNewIventButton() {
-    const newAddIventButton = document.querySelector(`.trip-main__event-add-btn`);
     newAddIventButton.disabled = false;
   }
 }

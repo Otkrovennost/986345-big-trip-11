@@ -63,7 +63,7 @@ export default class TripController {
 
   show() {
     this._daysContainer.show();
-    this._sortComponent.hide();
+    this._sortComponent.show();
   }
 
   render() {
