@@ -27,7 +27,7 @@ export default class StatisticsController {
     if (oldComponent) {
       replace(this._statisticsComponent, oldComponent);
     } else {
-      renderElement(container, this._statisticsComponent, RenderPosition.BEFOREEND);
+      renderElement(container, this._statisticsComponent, RenderPosition.AFTEREND);
     }
   }
 }

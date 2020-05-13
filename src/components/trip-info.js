@@ -8,7 +8,11 @@ const TRIP_LENGTH = {
 };
 
 const getTotalCost = (points) => {
-  return points.reduce((acc, curr) => acc + curr.price, 0);
+  return points.reduce((sum, point) => {
+    return sum + point.price + point.offers.reduce((offerCost, it) => {
+      return offerCost + it.price;
+    }, 0);
+  }, 0);
 };
 
 const getCitiesRoute = (points) => {

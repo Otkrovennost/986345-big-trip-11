@@ -8,6 +8,8 @@ const Method = {
   DELETE: `DELETE`
 };
 
+const URLS = [`destinations`, `offers`, `points`];
+
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -22,6 +24,25 @@ export default class API {
     this._authorization = authorization;
   }
 
+  getData() {
+    const requests = URLS.map((it) => this._load({url: it}));
+    return Promise.all(requests)
+      .then((responses) => Promise.all(responses.map((it) => it.json())))
+      .then((responses) => {
+        const [destinations, offers, points] = responses;
+        Store.setDestinations(destinations);
+        Store.setOffers(offers);
+        return points;
+      })
+      .then(Point.parsePoints);
+  }
+
+  getPoints() {
+    return this._load({url: `points`})
+    .then((response) => response.json())
+    .then(Point.parsePoints);
+  }
+
   getDestinations() {
     return this._load({url: `destinations`})
       .then((response) => response.json())
@@ -32,12 +53,6 @@ export default class API {
     return this._load({url: `offers`})
       .then((response) => response.json())
       .then(Store.setOffers);
-  }
-
-  getPoints() {
-    return this._load({url: `points`})
-    .then((response) => response.json())
-    .then(Point.parsePoints);
   }
 
   createPoint(point) {

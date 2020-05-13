@@ -2,10 +2,10 @@ import moment from "moment";
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
-import {EmptyPoint} from '../controllers/point-controller.js';
-import {clearString, getUpperCaseFirstLetter} from '../utils/common.js';
-import {routeTypes, actionByTypeToPlaceholder} from '../utils/data.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import {clearString, getUpperCaseFirstLetter} from '../utils/common.js';
+import {EmptyPoint} from '../controllers/point-controller.js';
+import {routeTypes, actionByTypeToPlaceholder} from '../const.js';
 import Store from '../models/store.js';
 
 const DefaultData = {
@@ -35,8 +35,8 @@ const getTypeActivity = (arr) => {
   }).join(``);
 };
 
-const getOffers = (arr) => {
-  return arr.map((offer) => {
+const getOffers = (array) => {
+  return array.map((offer) => {
     return (`
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}" type="checkbox" name="event-${offer.title}"  ${offer.isChecked ? `checked` : ``}>
@@ -50,15 +50,15 @@ const getOffers = (arr) => {
   }).join(``);
 };
 
-const getPhotosList = (arr) => {
-  return arr.map((photo) => {
+const getPhotosList = (array) => {
+  return array.map((photo) => {
     return (`<img class="event__photo" src="${photo.src}" alt="${photo.description}">`);
   }).join(``);
 };
 
-const getCities = (arr, elem) => {
-  return arr.map((cityName) => {
-    return (`<option value="${cityName}" ${cityName === elem ? `selected` : ``}>${cityName}</option>`);
+const getCities = (array, element) => {
+  return array.map((cityName) => {
+    return (`<option value="${cityName}" ${cityName === element ? `selected` : ``}>${cityName}</option>`);
   }).join(``);
 };
 
@@ -87,7 +87,7 @@ const createEditEventTemplate = (point, options) => {
   const saveButtonText = externalData.saveButtonText;
 
   return (
-    `<form class="event  event--edit" action="#" method="post">
+    `<form class="trip-events__item event event--edit" action="#" method="post">
       <header class="event__header">
       <input class="visually-hidden" name="event-current-type" id="event-current-type-name" value="${type}">
         <div class="event__type-wrapper">
@@ -227,18 +227,6 @@ export default class EventEdit extends AbstractSmartComponent {
     this.rerender();
   }
 
-  removeElement() {
-    if (this._flatpickrStartDate || this._flatpickrEndDate) {
-      this._flatpickrStartDate.destroy();
-      this._flatpickrEndDate.destroy();
-      this._flatpickrStartDate = null;
-      this._flatpickrEndDate = null;
-      this._clickHandler = null;
-    }
-
-    super.removeElement();
-  }
-
   rerender() {
     super.rerender();
 
@@ -258,11 +246,36 @@ export default class EventEdit extends AbstractSmartComponent {
 
     this._type = point.type;
     this._city = point.city;
-    this._description = point.description;
-    this._photos = point.photos;
-    this._offers = point.offers;
 
     this.rerender();
+  }
+
+  disableForm() {
+    const form = this.getElement();
+    const elements = Array.from(form.elements);
+    elements.forEach((elem) => {
+      elem.readOnly = true;
+    });
+  }
+
+  activeForm() {
+    const form = this.getElement();
+    const elements = Array.from(form.elements);
+    elements.forEach((elem) => {
+      elem.readOnly = false;
+    });
+  }
+
+  removeElement() {
+    if (this._flatpickrStartDate || this._flatpickrEndDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrEndDate.destroy();
+      this._flatpickrStartDate = null;
+      this._flatpickrEndDate = null;
+      this._clickHandler = null;
+    }
+
+    super.removeElement();
   }
 
   setClickHandler(handler) {
@@ -278,7 +291,6 @@ export default class EventEdit extends AbstractSmartComponent {
     this._submitHandler = handler;
   }
 
-
   setDeleteButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
 
@@ -288,22 +300,6 @@ export default class EventEdit extends AbstractSmartComponent {
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
     this._favoritesClickHandler = handler;
-  }
-
-  disableForm() {
-    const form = this.getElement();
-    const elements = Array.from(form.elements);
-    elements.forEach((elm) => {
-      elm.readOnly = true;
-    });
-  }
-
-  activeForm() {
-    const form = this.getElement();
-    const elements = Array.from(form.elements);
-    elements.forEach((elm) => {
-      elm.readOnly = false;
-    });
   }
 
   _subscribeOnEvents() {
@@ -327,6 +323,11 @@ export default class EventEdit extends AbstractSmartComponent {
     element.querySelector(`.event__input--price`).addEventListener(`input`, (evt) => {
       evt.target.value = clearString(evt.target.value);
     });
+
+    element.querySelector(`#event-start-time-1`).addEventListener(`change`, (evt) => {
+      const endDateInput = element.querySelector(`#event-end-time-1`);
+      endDateInput.value = evt.target.value;
+    });
   }
 
   _applyFlatpickr() {
@@ -349,5 +350,11 @@ export default class EventEdit extends AbstractSmartComponent {
     this._flatpickrStartDate = flatpickr(element.querySelector(`#event-start-time-1`), Object.assign({}, options, {defaultDate: this._point.start}));
 
     this._flatpickrEndDate = flatpickr(element.querySelector(`#event-end-time-1`), Object.assign({}, options, {defaultDate: this._point.end}));
+
+    const flatpickrEndDate = this._flatpickrEndDate;
+
+    this._flatpickrStartDate.config.onChange.push((selectedDates) => {
+      flatpickrEndDate.set(`minDate`, selectedDates[0]);
+    });
   }
 }

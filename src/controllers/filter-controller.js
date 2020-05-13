@@ -1,5 +1,5 @@
 import Filter from '../components/filter.js';
-import {FilterType} from '../utils/data.js';
+import {FilterType} from '../const.js';
 import {renderElement, replace, RenderPosition} from '../utils/render.js';
 
 export default class FilterController {
@@ -14,12 +14,34 @@ export default class FilterController {
     this._onFilterChange = this._onFilterChange.bind(this);
   }
 
+  getFilterType() {
+    return this._activeFilterType;
+  }
+
+  setFilterType(type) {
+    this._activeFilterType = type;
+  }
+
+  show() {
+    this._filterComponent.show();
+  }
+
+  hide() {
+    this._filterComponent.hide();
+  }
+
+  rerender() {
+    this.setFilterType(FilterType.EVERYTHING);
+    this._onFilterChange(this.getFilterType());
+    this._filterComponent.checkDefaultFilterForInput();
+  }
+
   render() {
     const container = this._container;
     const filters = Object.values(FilterType).map((filterType) => {
       return {
         name: filterType,
-        checked: filterType === this._activeFilterType,
+        isChecked: filterType === this._activeFilterType,
       };
     });
     const oldComponent = this._filterComponent;

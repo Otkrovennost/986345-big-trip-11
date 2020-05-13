@@ -1,5 +1,5 @@
+import {FilterType} from '../const.js';
 import {getPointsByFilter} from '../utils/filter.js';
-import {FilterType} from '../utils/data.js';
 
 export default class PointsModel {
   constructor() {
@@ -21,6 +21,19 @@ export default class PointsModel {
   setPoints(points) {
     this._points = Array.from(points);
     this._callHandlers(this._dataChangeHandlers);
+  }
+
+  setFilter(filterType) {
+    this._activeFilterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
+  }
+
+  setFilterChangeHandler(handler) {
+    this._filterChangeHandlers.push(handler);
+  }
+
+  setDataChangeHandler(handler) {
+    this._dataChangeHandlers.push(handler);
   }
 
   removePoint(id) {
@@ -54,19 +67,6 @@ export default class PointsModel {
   addPoint(point) {
     this._points = [].concat(point, this._points);
     this._callHandlers(this._dataChangeHandlers);
-  }
-
-  setFilter(filterType) {
-    this._activeFilterType = filterType;
-    this._callHandlers(this._filterChangeHandlers);
-  }
-
-  setFilterChangeHandler(handler) {
-    this._filterChangeHandlers.push(handler);
-  }
-
-  setDataChangeHandler(handler) {
-    this._dataChangeHandlers.push(handler);
   }
 
   _callHandlers(handlers) {

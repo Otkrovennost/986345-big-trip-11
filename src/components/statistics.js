@@ -1,7 +1,7 @@
-import AbstractSmartComponent from './abstract-smart-component.js';
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const LegendName = {
   MONEY: `MONEY`,
@@ -160,6 +160,18 @@ export default class Statistics extends AbstractSmartComponent {
     return createStatisticsTemplate();
   }
 
+  rerender() {
+    super.rerender();
+    this._renderCharts();
+  }
+
+  show() {
+    super.show();
+    this.rerender();
+  }
+
+  recoveryListeners() {}
+
   _renderCharts() {
     const element = this.getElement();
     const moneyCtx = element.querySelector(`.statistics__chart--money`);
@@ -176,18 +188,6 @@ export default class Statistics extends AbstractSmartComponent {
 
     this._timeChart = renderChart(timeCtx, generateChartData(`TIME-SPENT`, points), LabelName.HOURS, LegendName.TIME);
   }
-
-  rerender() {
-    super.rerender();
-    this._renderCharts();
-  }
-
-  show() {
-    super.show();
-    this.rerender();
-  }
-
-  recoveryListeners() {}
 
   _resetCharts() {
     this._resetChart(this._moneyChart);
