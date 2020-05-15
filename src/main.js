@@ -8,7 +8,7 @@ import StatisticsController from "./controllers/statistics-controller.js";
 import TripController from './controllers/trip-controller.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const AUTHORIZATION = `Basic SSfcyfgfcdcd2tvfddfreh`;
+const AUTHORIZATION = `Basic SSfcyfgfcdcd2txdffreh`;
 const tripControls = document.querySelector(`.trip-main__trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripInfoBlock = document.querySelector(`.trip-main`);
@@ -61,3 +61,8 @@ siteMenu.setOnChange((item) => {
       break;
   }
 });
+
+// import AppController from './controllers/app-controller.js';
+
+// const app = new AppController();
+// app.render();

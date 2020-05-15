@@ -54,14 +54,30 @@ export default class FilterController {
     } else {
       renderElement(container, this._filterComponent, RenderPosition.BEFOREEND);
     }
+
+    // this._disableFilters();
   }
 
   _onFilterChange(filterType) {
     this._pointsModel.setFilter(filterType);
     this._activeFilterType = filterType;
+    // this._disableFilters();
   }
 
   _onDataChange() {
     this.render();
+    // this._disableFilters();
   }
+
+  // _disableFilters() {
+  //   this._filterComponent.activeAllFilters();
+
+  //   if (this._pointsModel.getPointsQuantityByFilterType(FilterType.FUTURE) === 0) {
+  //     this._filterComponent.makeFilterUnable(FilterType.FUTURE);
+  //   }
+
+  //   if (this._pointsModel.getPointsQuantityByFilterType(FilterType.PAST) === 0) {
+  //     this._filterComponent.makeFilterUnable(FilterType.PAST);
+  //   }
+  // }
 }
