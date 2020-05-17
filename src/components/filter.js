@@ -49,16 +49,6 @@ export default class Filter extends AbstractComponent {
     this._checkedFilterActive(defaulFilterTypeInput);
   }
 
-  activeAllFilters() {
-    this.element.querySelectorAll(`input`).forEach((filter) => {
-      filter.removeAttribute(`disabled`);
-    });
-  }
-
-  makeFilterUnable(filterType) {
-    this.element.querySelector(`#filter-${filterType}`).setAttribute(`disabled`, `disabled`);
-  }
-
   _checkedFilterActive(filterItem) {
     const filterItems = this.getElement().querySelectorAll(`.trip-filters__filter-input`);
 
