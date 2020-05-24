@@ -39,26 +39,10 @@ export default class Filter extends AbstractComponent {
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       const filterName = getFilterNameById(evt.target.id);
-      handler(filterName);
-      this._checkedFilterActive(evt.target);
-    });
-  }
-
-  checkDefaultFilterForInput() {
-    const defaulFilterTypeInput = this.getElement().querySelector(`#filter-everything`);
-    this._checkedFilterActive(defaulFilterTypeInput);
-  }
-
-  _checkedFilterActive(filterItem) {
-    const filterItems = this.getElement().querySelectorAll(`.trip-filters__filter-input`);
-
-    for (const filterElement of filterItems) {
-      if (filterElement.hasAttribute(`checked`)) {
-        filterElement.removeAttribute(`checked`);
-        break;
+      if (evt.target.tagName === `LABEL`) {
+        return;
       }
-    }
-
-    filterItem.setAttribute(`checked`, `checked`);
+      handler(filterName);
+    });
   }
 }

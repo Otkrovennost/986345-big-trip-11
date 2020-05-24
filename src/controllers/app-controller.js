@@ -8,10 +8,11 @@ import StatisticsController from './statistics-controller.js';
 import TripController from './trip-controller.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const AUTHORIZATION = `Basic SSfcyfgfcdcd2tvfddfreh`;
+const AUTHORIZATION = `Basic SSfcyfgffrtdfrfxdrreh`;
 const tripControls = document.querySelector(`.trip-main__trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripInfoBlock = document.querySelector(`.trip-main`);
+const addNewEventButton = document.querySelector(`.trip-main__event-add-btn`);
 
 export default class AppController {
   constructor() {
@@ -22,19 +23,18 @@ export default class AppController {
     this._filterController = new FilterController(tripControls, this._pointsModel);
     this._infoController = new InfoController(tripInfoBlock, this._pointsModel);
     this._statisticsController = new StatisticsController(tripEvents, this._pointsModel);
-  }
-
-  render() {
-    renderElement(tripControls, this._siteMenu, RenderPosition.BEFOREEND);
 
     this._infoController.render();
     this._statisticsController.render();
     this._statisticsController.hide();
     this._tripController.isLoading();
 
-    this._addNewEventButton();
-    this._setSiteMenuNavigation();
+    this._setSiteNavigation();
+    this._setCreateEvent();
+    renderElement(tripControls, this._siteMenu, RenderPosition.BEFOREEND);
+  }
 
+  render() {
     this._api.getData()
     .then((points) => {
       this._pointsModel.setPoints(points);
@@ -44,12 +44,13 @@ export default class AppController {
     });
   }
 
-  _addNewEventButton() {
-    const addNewEventButton = document.querySelector(`.trip-main__event-add-btn`);
-    addNewEventButton.disabled = true;
-    this._tripController.rerender();
-    // this._filterController.rerender();
-    this._tripController.createPoint();
+  _setCreateEvent() {
+    addNewEventButton.addEventListener(`click`, () => {
+      this._filterController.rerender();
+      this._tripController.rerender();
+      this._tripController.createPoint();
+      addNewEventButton.disabled = true;
+    });
   }
 
   _setSiteNavigation() {
@@ -58,13 +59,11 @@ export default class AppController {
         case MenuItem.TABLE:
           this._siteMenu.setActiveItem(MenuItem.TABLE);
           this._tripController.show();
-          this._filterController.show();
           this._statisticsController.hide();
           break;
         case MenuItem.STATS:
           this._siteMenu.setActiveItem(MenuItem.STATS);
           this._tripController.hide();
-          this._filterController.hide();
           this._statisticsController.show();
           break;
       }
