@@ -9,20 +9,20 @@ import TripController from './trip-controller.js';
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 const AUTHORIZATION = `Basic SSfcyfgffrtdfrfxdrreh`;
-const tripControls = document.querySelector(`.trip-main__trip-controls`);
-const tripEvents = document.querySelector(`.trip-events`);
-const tripInfoBlock = document.querySelector(`.trip-main`);
-const addNewEventButton = document.querySelector(`.trip-main__event-add-btn`);
+const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
+const tripEventsElement = document.querySelector(`.trip-events`);
+const tripInfoBlockElement = document.querySelector(`.trip-main`);
+const addNewEventElement = document.querySelector(`.trip-main__event-add-btn`);
 
 export default class AppController {
   constructor() {
     this._api = new API(END_POINT, AUTHORIZATION);
     this._siteMenu = new SiteMenu();
     this._pointsModel = new PointsModel();
-    this._tripController = new TripController(tripEvents, this._pointsModel, this._api);
-    this._filterController = new FilterController(tripControls, this._pointsModel);
-    this._infoController = new InfoController(tripInfoBlock, this._pointsModel);
-    this._statisticsController = new StatisticsController(tripEvents, this._pointsModel);
+    this._tripController = new TripController(tripEventsElement, this._pointsModel, this._api);
+    this._filterController = new FilterController(tripControlsElement, this._pointsModel);
+    this._infoController = new InfoController(tripInfoBlockElement, this._pointsModel);
+    this._statisticsController = new StatisticsController(tripEventsElement, this._pointsModel);
 
     this._infoController.render();
     this._statisticsController.render();
@@ -31,7 +31,7 @@ export default class AppController {
 
     this._setSiteNavigation();
     this._setCreateEvent();
-    renderElement(tripControls, this._siteMenu, RenderPosition.BEFOREEND);
+    renderElement(tripControlsElement, this._siteMenu, RenderPosition.BEFOREEND);
   }
 
   render() {
@@ -45,11 +45,11 @@ export default class AppController {
   }
 
   _setCreateEvent() {
-    addNewEventButton.addEventListener(`click`, () => {
+    addNewEventElement.addEventListener(`click`, () => {
       this._filterController.rerender();
       this._tripController.rerender();
       this._tripController.createPoint();
-      addNewEventButton.disabled = true;
+      addNewEventElement.disabled = true;
     });
   }
 

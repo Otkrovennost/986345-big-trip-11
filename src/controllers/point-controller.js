@@ -1,5 +1,5 @@
 import moment from "moment";
-import {DuringData} from '../const.js';
+import {DuringData, Keys} from '../const.js';
 import Event from '../components/event.js';
 import EventEdit from '../components/event-edit.js';
 import PointModel from '../models/point.js';
@@ -191,7 +191,7 @@ export default class PointController {
   }
 
   _onEscKeyDown(evt) {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+    const isEscKey = evt.key === Keys.ESCAPE || evt.key === Keys.ESC;
 
     if (isEscKey) {
       if (this._mode === Mode.CREATING) {

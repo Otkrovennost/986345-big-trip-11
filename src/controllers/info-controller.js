@@ -1,4 +1,4 @@
-import Info from "../components/trip-info.js";
+import TripInfo from "../components/trip-info.js";
 import {renderElement, RenderPosition, replace} from "../utils/render.js";
 
 export default class InfoController {
@@ -18,7 +18,7 @@ export default class InfoController {
 
     const oldComponent = this._infoComponent;
 
-    this._infoComponent = new Info(this._pointsModel);
+    this._infoComponent = new TripInfo(this._pointsModel);
 
     if (oldComponent) {
       replace(this._infoComponent, oldComponent);

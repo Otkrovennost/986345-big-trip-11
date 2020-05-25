@@ -65,7 +65,7 @@ const createTripInfoTemplate = (points) => {
   );
 };
 
-export default class Info extends AbstractComponent {
+export default class TripInfo extends AbstractComponent {
   constructor(pointsModel) {
     super();
 
