@@ -169,8 +169,8 @@ export default class PointController {
       this._eventComponent.getElement().style.animation = ``;
 
       this._eventEditComponent.setData({
-        saveButtonText: DefaultData.DELETE_BTN,
-        deleteButtonText: DefaultData.SAVE_BTN,
+        saveButtonText: DefaultData.SAVE_BTN,
+        deleteButtonText: DefaultData.DELETE_BTN,
       });
     }, SHAKE_ANIMATION_TIMEOUT);
   }
