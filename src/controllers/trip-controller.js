@@ -81,9 +81,8 @@ export default class TripController {
   }
 
   rerender() {
-    this._updatePoints();
     this._sortComponent.setSortType(SortType.EVENT);
-    this._onSortTypeChange(this._sortComponent.getSortType());
+    this._updatePoints();
     this._sortComponent.checkDefaultSortForInput();
   }
 
@@ -91,7 +90,6 @@ export default class TripController {
     if (this._creatingPoint) {
       return;
     }
-
     this._creatingPoint = new PointController(this._daysContainer.getElement(), this._onDataChange, this._onViewChange);
     this._creatingPoint.render(EmptyPoint, PointControllerMode.CREATING);
     this._onViewChange();
@@ -113,7 +111,7 @@ export default class TripController {
 
   _updatePoints() {
     this._removePoints();
-    this._pointsControllers = renderPoints(this._pointsModel.getPoints(), this._daysContainer, this._onDataChange, this._onViewChange);
+    this._onSortTypeChange(this._sortComponent.getSortType());
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -122,7 +120,6 @@ export default class TripController {
       if (newData === null) {
         pointController.destroy();
         this._updatePoints();
-        this._onSortTypeChange(this._sortComponent.getSortType());
       } else {
         this._api.createPoint(newData)
           .then((pointModel) => {
@@ -139,7 +136,6 @@ export default class TripController {
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
           this._updatePoints();
-          this._onSortTypeChange(this._sortComponent.getSortType());
         })
         .catch(() => {
           pointController.shake();
@@ -151,7 +147,6 @@ export default class TripController {
 
           if (isSuccess) {
             this._updatePoints();
-            this._onSortTypeChange(this._sortComponent.getSortType());
           }
         })
         .catch(() => {
@@ -180,8 +175,6 @@ export default class TripController {
 
     this._removePoints();
     this._pointsControllers = renderPoints(sortedPoints, this._daysContainer, this._onDataChange, this._onViewChange, isDefaultSorting);
-
-    return this._pointsControllers;
   }
 
   _onViewChange() {
@@ -190,7 +183,6 @@ export default class TripController {
 
   _onFilterChange() {
     this._updatePoints();
-    this._onSortTypeChange(this._sortComponent.getSortType());
     this._createPoint = null;
   }
 }

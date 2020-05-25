@@ -48,3 +48,8 @@ export const FilterType = {
   FUTURE: `future`,
   PAST: `past`
 };
+
+export const DuringData = {
+  DELETE_BTN: `Deleting...`,
+  SAVE_BTN: `Saving...`,
+};

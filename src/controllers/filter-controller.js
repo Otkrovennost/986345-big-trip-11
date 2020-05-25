@@ -22,6 +22,11 @@ export default class FilterController {
     this._activeFilterType = type;
   }
 
+  setDefaultView() {
+    this._activeFilterType = FilterType.EVERYTHING;
+    this.render();
+  }
+
   show() {
     this._filterComponent.show();
   }
@@ -31,9 +36,8 @@ export default class FilterController {
   }
 
   rerender() {
-    this.setFilterType(FilterType.EVERYTHING);
+    this.setDefaultView();
     this._onFilterChange(this.getFilterType());
-    this._filterComponent.checkDefaultFilterForInput();
   }
 
   render() {

@@ -5,7 +5,6 @@ export default class StatisticsController {
   constructor(container, pointsModel) {
     this._container = container;
     this._pointsModel = pointsModel;
-
     this._statisticsComponent = null;
   }
 

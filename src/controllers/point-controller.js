@@ -1,4 +1,5 @@
 import moment from "moment";
+import {DuringData} from '../const.js';
 import Event from '../components/event.js';
 import EventEdit from '../components/event-edit.js';
 import PointModel from '../models/point.js';
@@ -8,6 +9,7 @@ import Store from '../models/store.js';
 const newAddIventButton = document.querySelector(`.trip-main__event-add-btn`);
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
+const ERROR_BORDER = `2px solid red`;
 export const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
@@ -89,7 +91,7 @@ export default class PointController {
       const data = parseFormData(formData);
       this._eventEditComponent.disableForm();
       this._eventEditComponent.setData({
-        saveButtonText: `Saving...`,
+        saveButtonText: DuringData.SAVE_BTN,
       });
 
       this._onDataChange(this, _point, data);
@@ -101,7 +103,7 @@ export default class PointController {
       evt.preventDefault();
 
       this._eventEditComponent.setData({
-        deleteButtonText: `Deleting...`,
+        deleteButtonText: DuringData.DELETE_BTN,
       });
       this._eventEditComponent.disableForm();
       if (this._mode === Mode.CREATING) {
@@ -117,6 +119,11 @@ export default class PointController {
       const newPoint = PointModel.clone(_point);
       newPoint.isFavorite = !newPoint.isFavorite;
       this._onDataChange(this, _point, newPoint);
+    });
+
+    this._eventEditComponent.setClickHandler((evt) => {
+      evt.preventDefault();
+      this._replaceEditToTask();
     });
 
     switch (mode) {
@@ -155,6 +162,7 @@ export default class PointController {
   shake() {
     this._eventEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
     this._eventComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._eventEditComponent.getElement().style.border = ERROR_BORDER;
 
     setTimeout(() => {
       this._eventEditComponent.getElement().style.animation = ``;

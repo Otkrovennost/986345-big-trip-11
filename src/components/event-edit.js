@@ -201,6 +201,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this._favoritesClickHandler = null;
     this._submitHandler = null;
     this._deleteButtonClickHandler = null;
+    this._clickHandler = null;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -272,7 +273,6 @@ export default class EventEdit extends AbstractSmartComponent {
       this._flatpickrEndDate.destroy();
       this._flatpickrStartDate = null;
       this._flatpickrEndDate = null;
-      this._clickHandler = null;
     }
 
     super.removeElement();
