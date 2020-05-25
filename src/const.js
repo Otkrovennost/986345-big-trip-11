@@ -49,6 +49,11 @@ export const FilterType = {
   PAST: `past`
 };
 
+export const DefaultData = {
+  DELETE_BTN: `Delete`,
+  SAVE_BTN: `Save`,
+};
+
 export const DuringData = {
   DELETE_BTN: `Deleting...`,
   SAVE_BTN: `Saving...`,

@@ -1,5 +1,5 @@
 import moment from "moment";
-import {DuringData, Keys} from '../const.js';
+import {DuringData, DefaultData, Keys} from '../const.js';
 import Event from '../components/event.js';
 import EventEdit from '../components/event-edit.js';
 import PointModel from '../models/point.js';
@@ -169,8 +169,8 @@ export default class PointController {
       this._eventComponent.getElement().style.animation = ``;
 
       this._eventEditComponent.setData({
-        saveButtonText: `Save`,
-        deleteButtonText: `Delete`,
+        saveButtonText: DefaultData.DELETE_BTN,
+        deleteButtonText: DefaultData.SAVE_BTN,
       });
     }, SHAKE_ANIMATION_TIMEOUT);
   }
