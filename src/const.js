@@ -53,3 +53,8 @@ export const DuringData = {
   DELETE_BTN: `Deleting...`,
   SAVE_BTN: `Saving...`,
 };
+
+export const Keys = {
+  ESCAPE: `Escape`,
+  ESC: `Esc`
+};
